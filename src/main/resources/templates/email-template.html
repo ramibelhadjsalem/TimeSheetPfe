@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .email-container {
+            background-color: #ffffff;
+            margin: 50px auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 600px;
+        }
+        .email-header {
+            text-align: center;
+            border-bottom: 1px solid #dddddd;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .email-header h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #333333;
+        }
+        .email-body {
+            font-size: 16px;
+            color: #555555;
+            line-height: 1.6;
+        }
+        .email-body p {
+            margin: 10px 0;
+        }
+        .email-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #aaaaaa;
+        }
+    </style>
+</head>
+<body>
+<div class="email-container">
+    <div class="email-header">
+        <h1>Bonjour, [[${firstname}]],</h1>
+    </div>
+    <div class="email-body">
+        <p>Voici vos informations de connexion :</p>
+        <p><strong>Email:</strong> [[${email}]]</p>
+        <p><strong>Mot de passe:</strong> [[${password}]]</p>
+        <p>Cordialement,</p>
+        <p>L'équipe</p>
+    </div>
+    <div class="email-footer">
+        <p>&copy; 2024 Votre Entreprise. Tous droits réservés.</p>
+    </div>
+</div>
+</body>
+</html>

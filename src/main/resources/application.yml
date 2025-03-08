@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: TimeSheetPfe
+  datasource:
+    url: jdbc:postgresql://ep-black-dream-a2l4bfzr-pooler.eu-central-1.aws.neon.tech/timesheetapp?sslmode=require
+    username: timesheetapp_owner
+    password: npg_udNUbLA7S9Gq
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        show_sql: true
+  logging:
+    level:
+      org:
+        hibernate:
+          SQL: DEBUG
+          type:
+            descriptor:
+              sql: TRACE
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: yassin2016.attoui@gmail.com
+    password: rynibrvlkcutagbj
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+
+jwtSecret: 04ca023b39512e46d0c2cf4b48d5aac61d34302994c87ed4eff225dcf3b0a218739f3897051a057f9b846a69ea2927a587044164b7bae5e1306219d50b588cb1
+jwtExpirationMs: 86400000

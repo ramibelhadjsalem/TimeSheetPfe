@@ -1,0 +1,50 @@
+package com.tunisys.TimeSheetPfe;
+
+import com.tunisys.TimeSheetPfe.models.ERole;
+import com.tunisys.TimeSheetPfe.models.Role;
+import com.tunisys.TimeSheetPfe.models.UserModel;
+import com.tunisys.TimeSheetPfe.repositories.RoleRepository;
+import com.tunisys.TimeSheetPfe.repositories.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+@SpringBootApplication
+public class TimeSheetPfeApplication {
+
+	@Autowired
+	private PasswordEncoder encoder;
+	public static void main(String[] args) {
+		SpringApplication.run(TimeSheetPfeApplication.class, args);
+	}
+
+	@Bean
+	CommandLineRunner run(RoleRepository roleRepository , UserRepository userRepository){
+		return args -> {
+
+			if (roleRepository.count()<1) {
+
+				roleRepository.save(new Role( null, ERole.MANAGER));
+				roleRepository.save(new Role(null, ERole.ADMIN));
+				roleRepository.save(new Role(null,ERole.EMPLOYER));
+			}
+			if(!userRepository.existsByEmail("yassin2016.attoui@gmail.com")){
+				UserModel user = new UserModel(
+						"yassin2016.attoui@gmail.com",
+
+						encoder.encode("password")
+				);
+
+				Role adminRole = roleRepository.findRoleByName(ERole.ADMIN)
+						.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+
+				user.getRoles().add(adminRole);
+				userRepository.save(user);
+			}
+		};
+	}
+
+}
