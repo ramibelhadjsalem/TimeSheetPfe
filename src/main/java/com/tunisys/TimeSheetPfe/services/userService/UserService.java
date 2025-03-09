@@ -1,7 +1,6 @@
 package com.tunisys.TimeSheetPfe.services.userService;
 
 
-import com.tunisys.TimeSheetPfe.exceptions.EntityNotFoundException;
 import com.tunisys.TimeSheetPfe.models.ERole;
 import com.tunisys.TimeSheetPfe.models.Role;
 import com.tunisys.TimeSheetPfe.models.UserModel;
@@ -9,6 +8,8 @@ import com.tunisys.TimeSheetPfe.repositories.UserRepository;
 import com.tunisys.TimeSheetPfe.services.roleService.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.NoSuchElementException;
 
 @Service
 public class UserService implements IUserService{
@@ -39,14 +40,14 @@ public class UserService implements IUserService{
     @Override
     public UserModel findById(Long id) {
         UserModel user=userRepository.findById(id)
-                .orElseThrow(()-> new EntityNotFoundException("User not found with id : "+id));
+                .orElseThrow(()-> new NoSuchElementException("User not found with id : "+id));
         return user;
     }
 
     @Override
     public UserModel findByEmail(String email) {
         UserModel user=userRepository.findByEmail(email)
-                .orElseThrow(()-> new EntityNotFoundException("User not found with email : "+email));
+                .orElseThrow(()-> new NoSuchElementException("User not found with email : "+email));
         return user;
     }
 

@@ -26,7 +26,7 @@ public class Task {
     private String title;
     @JsonView(View.Base.class)
     private String description;
-    
+
     @Enumerated(EnumType.STRING)
     @JsonView(View.Base.class)
     private EStatus status = EStatus.NOT_STARTED;

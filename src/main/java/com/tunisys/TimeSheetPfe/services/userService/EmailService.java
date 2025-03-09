@@ -48,5 +48,30 @@ public class EmailService {
 
     }
 
+    public void sendResetPassword(String from, String to, String subject, String name, String email, String password) throws MessagingException, IOException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        helper.setFrom(from);
+        helper.setTo(to);
+        helper.setSubject(subject);
+
+        Context context = new Context();
+        context.setVariable("name", name);
+        context.setVariable("email", email);
+        context.setVariable("newPassword", password);
+
+        String htmlContent = templateEngine.process("reset-password-email", context);
+
+        helper.setText(htmlContent, true);
+
+        try {
+            mailSender.send(message);
+        } catch (Exception e) {
+            if (e.getCause() instanceof jakarta.mail.SendFailedException) {
+                throw new EmailNotFoundException("The from email address is not found: " + from);
+            }
+            throw e;
+        }
+    }
 
 }
