@@ -1,64 +1,126 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f7f9fc;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.5;
         }
         .email-container {
+            max-width: 650px;
+            margin: 0 auto;
             background-color: #ffffff;
-            margin: 50px auto;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            max-width: 600px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
         }
         .email-header {
+            background: linear-gradient(135deg, #4a90e2, #357abd);
+            padding: 30px 20px;
             text-align: center;
-            border-bottom: 1px solid #dddddd;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
+            color: #ffffff;
         }
         .email-header h1 {
+            font-size: 26px;
+            font-weight: 600;
             margin: 0;
-            font-size: 24px;
-            color: #333333;
+        }
+        .email-header .subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 5px;
         }
         .email-body {
+            padding: 30px;
+            color: #444444;
             font-size: 16px;
-            color: #555555;
-            line-height: 1.6;
         }
         .email-body p {
+            margin-bottom: 15px;
+        }
+        .credentials {
+            background-color: #f9fafb;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .credentials p {
             margin: 10px 0;
         }
+        .credentials strong {
+            color: #2c3e50;
+            display: inline-block;
+            min-width: 100px;
+        }
+        .highlight {
+            color: #e74c3c;
+            font-weight: 600;
+        }
         .email-footer {
+            background-color: #f1f3f5;
+            padding: 20px;
             text-align: center;
-            margin-top: 20px;
+            font-size: 13px;
+            color: #7f8c8d;
+            border-top: 1px solid #e0e4e8;
+        }
+        .email-footer a {
+            color: #4a90e2;
+            text-decoration: none;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #4a90e2;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 6px;
             font-size: 14px;
-            color: #aaaaaa;
+            margin-top: 20px;
+        }
+        .btn:hover {
+            background-color: #357abd;
+        }
+        @media (max-width: 600px) {
+            .email-container {
+                margin: 10px;
+            }
+            .email-body {
+                padding: 20px;
+            }
         }
     </style>
 </head>
 <body>
 <div class="email-container">
     <div class="email-header">
-        <h1>Bonjour, [[${firstname}]],</h1>
+        <h1>Bonjour, <span th:text="${firstname}"></span> !</h1>
+        <p class="subtitle">Bienvenue dans notre équipe</p>
     </div>
     <div class="email-body">
-        <p>Voici vos informations de connexion :</p>
-        <p><strong>Email:</strong> [[${email}]]</p>
-        <p><strong>Mot de passe:</strong> [[${password}]]</p>
-        <p>Cordialement,</p>
-        <p>L'équipe</p>
+        <p>Votre compte a été créé avec succès. Voici vos informations de connexion :</p>
+        <div class="credentials">
+            <p><strong>Email :</strong> <span th:text="${email}"></span></p>
+            <p><strong>Mot de passe :</strong> <span class="highlight" th:text="${password}"></span></p>
+        </div>
+        <p>Nous vous recommandons de changer votre mot de passe dès votre première connexion pour plus de sécurité.</p>
+        <p>Si vous avez des questions, n’hésitez pas à contacter notre équipe.</p>
+        <p>Cordialement,<br>L’équipe de Votre Entreprise</p>
+        <a href="#" class="btn" th:href="${loginUrl}">Se connecter maintenant</a>
     </div>
     <div class="email-footer">
-        <p>&copy; 2024 Votre Entreprise. Tous droits réservés.</p>
+        <p>© 2025 Votre Entreprise. Tous droits réservés.</p>
+        <p><a href="#" th:href="${supportUrl}">Support</a> | <a href="#" th:href="${privacyUrl}">Politique de confidentialité</a></p>
     </div>
 </div>
 </body>

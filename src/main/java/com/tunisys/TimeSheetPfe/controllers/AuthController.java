@@ -1,11 +1,7 @@
 package com.tunisys.TimeSheetPfe.controllers;
 
 import com.tunisys.TimeSheetPfe.DTOs.request.LoginRequest;
-import com.tunisys.TimeSheetPfe.DTOs.request.SignupRequest;
 import com.tunisys.TimeSheetPfe.DTOs.response.JwtResponse;
-import com.tunisys.TimeSheetPfe.DTOs.response.MessageResponse;
-import com.tunisys.TimeSheetPfe.models.ERole;
-import com.tunisys.TimeSheetPfe.models.Role;
 import com.tunisys.TimeSheetPfe.models.UserModel;
 import com.tunisys.TimeSheetPfe.repositories.RoleRepository;
 import com.tunisys.TimeSheetPfe.securities.jwt.JwtUtils;
@@ -26,9 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -69,7 +63,10 @@ public class AuthController {
         UserModel user=userService.findById(userDetails.getId());
         userService.saveUser(user);
         return ResponseEntity.ok( JwtResponse.builder()
+                .name(user.getName())
+                .email(user.getEmail())
                 .token(jwt)
+                .imgUrl(user.getImgUrl())
                 .refreshToken(refreshJwt)
                 .roles(roles)
                 .build());

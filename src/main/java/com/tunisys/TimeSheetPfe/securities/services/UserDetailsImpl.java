@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 
 public class UserDetailsImpl implements UserDetails {
     private Long id;
-
     private String email;
     @JsonIgnore
     private  String password;

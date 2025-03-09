@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.stream.Collectors;
+
 @Component
 public class JwtUtils {
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
@@ -30,7 +32,10 @@ public class JwtUtils {
                 .setId(userPrincipal.getId().toString())
                 .setSubject((userPrincipal.getUsername()))
                 .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+                .claim("roles",userPrincipal.getAuthorities().stream()
+                        .map(item -> item.getAuthority())
+                        .collect(Collectors.toList()))
+                .setExpiration(new Date((new Date()).getTime() + 8640000000L))
                 .signWith(key(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -41,7 +46,7 @@ public class JwtUtils {
                 .setId(userPrincipal.getId().toString())
                 .setSubject(userPrincipal.getUsername())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs*10))
+                .setExpiration(new Date((new Date()).getTime() + 8640000000L*10))
                 .signWith(key(),SignatureAlgorithm.HS256)
                 .compact();
     }

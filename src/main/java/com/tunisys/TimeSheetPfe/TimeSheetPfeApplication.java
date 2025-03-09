@@ -27,18 +27,17 @@ public class TimeSheetPfeApplication {
 
 			if (roleRepository.count()<1) {
 
-				roleRepository.save(new Role( null, ERole.MANAGER));
-				roleRepository.save(new Role(null, ERole.ADMIN));
-				roleRepository.save(new Role(null,ERole.EMPLOYER));
+				roleRepository.save(new Role( null, ERole.ROLE_ADMIN));
+				roleRepository.save(new Role(null, ERole.ROLE_MANAGER));
+				roleRepository.save(new Role(null,ERole.ROLE_EMPLOYEE));
 			}
 			if(!userRepository.existsByEmail("yassin2016.attoui@gmail.com")){
 				UserModel user = new UserModel(
 						"yassin2016.attoui@gmail.com",
-
 						encoder.encode("password")
 				);
 
-				Role adminRole = roleRepository.findRoleByName(ERole.ADMIN)
+				Role adminRole = roleRepository.findRoleByName(ERole.ROLE_ADMIN)
 						.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
 
 				user.getRoles().add(adminRole);
