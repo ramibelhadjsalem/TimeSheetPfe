@@ -5,6 +5,7 @@ import com.tunisys.TimeSheetPfe.models.Role;
 import com.tunisys.TimeSheetPfe.models.UserModel;
 import com.tunisys.TimeSheetPfe.repositories.RoleRepository;
 import com.tunisys.TimeSheetPfe.repositories.UserRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -44,6 +45,10 @@ public class TimeSheetPfeApplication {
 				userRepository.save(user);
 			}
 		};
+	}
+	@Bean
+	public ModelMapper modelMapper(){
+		return new ModelMapper();
 	}
 
 }

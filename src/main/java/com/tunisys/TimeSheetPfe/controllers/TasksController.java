@@ -48,6 +48,13 @@ public class TasksController {
             task.setManager(manager);
         }
 
+        // Map employee IDs to UserModels and add them to the task
+        if (taskRequest.getEmployeeIds() != null && !taskRequest.getEmployeeIds().isEmpty()) {
+            taskRequest.getEmployeeIds().stream()
+                    .map(userService::findById) // Find each user by ID
+                    .forEach(task::addEmployee); // Add the user to the task
+        }
+
         return ResponseEntity.ok(taskService.Save(task));
     }
 

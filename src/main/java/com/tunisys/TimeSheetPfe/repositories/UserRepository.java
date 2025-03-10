@@ -20,4 +20,8 @@ public interface UserRepository extends JpaRepository<UserModel,Long> {
     @Query("SELECT COUNT(u) FROM UserModel u JOIN u.roles r WHERE r.name = :roleName")
     Long countByRole(@Param("roleName") ERole roleName);
 
+
+    @Query("select u from UserModel u left join u.roles roles where roles.name in ?1")
+    List<UserModel> findByRoles_NameIn(List<ERole> roleNames);
+
 }

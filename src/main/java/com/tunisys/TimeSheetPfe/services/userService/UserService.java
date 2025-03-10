@@ -9,6 +9,7 @@ import com.tunisys.TimeSheetPfe.services.roleService.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -73,6 +74,11 @@ public class UserService implements IUserService{
         // Step 7: Return the created user
         return userRepository.save(user);
 
+    }
+
+    @Override
+    public List<UserModel> getUsersByRoles(List<ERole> roleNames) {
+        return userRepository.findByRoles_NameIn(roleNames);
     }
 
 }

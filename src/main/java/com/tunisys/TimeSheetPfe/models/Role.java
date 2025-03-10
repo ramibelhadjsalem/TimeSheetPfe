@@ -1,12 +1,13 @@
 package com.tunisys.TimeSheetPfe.models;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import com.tunisys.TimeSheetPfe.DTOs.view.View;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "roles")
@@ -16,5 +17,6 @@ public class Role {
     private Long id;
     @Enumerated(EnumType.STRING)
     @Column(length = 25)
+    @JsonView(View.Base.class)
     private ERole name;
 }

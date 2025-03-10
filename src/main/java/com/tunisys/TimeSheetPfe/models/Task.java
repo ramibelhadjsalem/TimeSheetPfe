@@ -1,5 +1,6 @@
 package com.tunisys.TimeSheetPfe.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.tunisys.TimeSheetPfe.DTOs.view.View;
 import jakarta.persistence.*;
@@ -22,8 +23,10 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonView(View.Base.class)
     private Long id;
+
     @JsonView(View.Base.class)
     private String title;
+
     @JsonView(View.Base.class)
     private String description;
 
@@ -35,7 +38,8 @@ public class Task {
     @JoinTable(name = "task_employees",
             joinColumns = @JoinColumn(name = "task_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
-    @JsonView(View.Base.class)
+    @JsonView(View.External.class)
+    @JsonManagedReference // Prevent recursion from Task to UserModel
     private Set<UserModel> employees = new HashSet<>(); // Employees working on the task
 
     @Enumerated(EnumType.STRING)
@@ -61,6 +65,11 @@ public class Task {
     @JoinColumn(name = "manager_id", referencedColumnName = "id")
     @JsonView(View.Base.class) // Include the manager in external views
     private UserModel manager ;
+
+
+    public void addEmployee(UserModel user) {
+        this.employees.add(user);
+    }
 }
 
 

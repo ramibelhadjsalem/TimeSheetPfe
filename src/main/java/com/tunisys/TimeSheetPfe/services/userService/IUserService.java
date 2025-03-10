@@ -23,4 +23,5 @@ public interface IUserService {
 
     UserModel createUserAndSendEmail(String email, ERole role);
 
+    List<UserModel> getUsersByRoles(List<ERole> roleNames);
 }

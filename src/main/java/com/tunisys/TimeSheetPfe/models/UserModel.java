@@ -1,5 +1,6 @@
 package com.tunisys.TimeSheetPfe.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.tunisys.TimeSheetPfe.DTOs.view.View;
@@ -23,14 +24,19 @@ public class UserModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonView(View.Base.class)
     private Long id;
+
     @JsonView(View.Base.class)
     private String name;
+
     @JsonIgnore
     private String password;
+
     @JsonView(View.Base.class)
     private String phone;
+
     @JsonView(View.Base.class)
     private String email;
+
     @JsonView(View.Base.class)
     private String imgUrl;
 
@@ -38,13 +44,16 @@ public class UserModel {
     @JoinTable(name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
-    @JsonIgnore
-    private Set<Role> roles=new HashSet<>();
+    @JsonView(View.Base.class)
+    private Set<Role> roles = new HashSet<>();
 
+    @ManyToMany(mappedBy = "employees", fetch = FetchType.LAZY)
+    @JsonView(View.Base.class)
+    @JsonBackReference()
+    private Set<Task> tasks = new HashSet<>();
 
     public UserModel(String email, String password) {
         this.email = email;
         this.password = password;
     }
-
 }
