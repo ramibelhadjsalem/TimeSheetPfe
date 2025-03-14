@@ -42,11 +42,8 @@ public class TasksController {
                 .attachments(taskRequest.getAttachments() != null ? taskRequest.getAttachments() : Collections.emptyList())
                 .employees(new HashSet<>())
                 .project(project)
+                .deadline(taskRequest.getDeadline())
                 .build();
-        if (taskRequest.getManagerId()!=null){
-            UserModel manager = userService.findById(taskRequest.getManagerId());
-            task.setManager(manager);
-        }
 
         // Map employee IDs to UserModels and add them to the task
         if (taskRequest.getEmployeeIds() != null && !taskRequest.getEmployeeIds().isEmpty()) {
