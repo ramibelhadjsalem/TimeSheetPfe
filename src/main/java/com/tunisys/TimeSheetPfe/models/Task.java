@@ -6,6 +6,7 @@ import com.tunisys.TimeSheetPfe.DTOs.view.View;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -65,6 +66,9 @@ public class Task {
     @JoinColumn(name = "manager_id", referencedColumnName = "id")
     @JsonView(View.Base.class) // Include the manager in external views
     private UserModel manager ;
+
+    @JsonView(View.Base.class)
+    private LocalDate deadline;
 
 
     public void addEmployee(UserModel user) {

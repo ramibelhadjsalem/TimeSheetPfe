@@ -53,10 +53,12 @@ public class UserService implements IUserService{
     }
 
     @Override
-    public UserModel createUserAndSendEmail(String email, ERole role) {
+    public UserModel createUserAndSendEmail(String email, ERole role,String name,String phone) {
         String generatedPassword =passwordService.generateRandomPassword();
         String encodedPassword = passwordService.encodePassword(generatedPassword);
         UserModel user = new UserModel(email,encodedPassword);
+        user.setName(name);
+        user.setPhone(phone);
         Role userRole = roleService.findRoleByName(role);
         user.getRoles().add(userRole);
 

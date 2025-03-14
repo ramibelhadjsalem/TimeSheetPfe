@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -24,8 +25,6 @@ public class TaskDto {
 
     @NotNull(message = "Project ID is required")
     private Long projectId;
-    @NotNull(message = "ManagerId ID is required")
-    private Long managerId;
     private Set<Long> employeeIds; // List of employees assigned to the task (can be empty)
 
     @Builder.Default
@@ -38,5 +37,7 @@ public class TaskDto {
     private String priority = "LOW"; // Default priority
 
     @Builder.Default
-    private String difficulty = "EASY"; // Default
+    private String difficulty = "EASY";
+    @NotNull(message = "Deadline is required")
+    private LocalDate deadline;
 }

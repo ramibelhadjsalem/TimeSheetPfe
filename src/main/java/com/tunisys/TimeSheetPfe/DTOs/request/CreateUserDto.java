@@ -16,4 +16,9 @@ public class CreateUserDto {
     @NotNull
     private ERole role;
 
+    @NotBlank(message = "name is required")
+    private String name;
+    @NotBlank(message = "phoneNumber is required")
+    private String phoneNumber;
+
 }
