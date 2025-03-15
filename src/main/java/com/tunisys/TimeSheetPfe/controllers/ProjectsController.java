@@ -1,9 +1,9 @@
 package com.tunisys.TimeSheetPfe.controllers;
 
-import com.fasterxml.jackson.annotation.JsonView;
+import com.tunisys.TimeSheetPfe.DTOs.request.AddStaffDto;
 import com.tunisys.TimeSheetPfe.DTOs.request.ProjectDtoRequest;
+import com.tunisys.TimeSheetPfe.DTOs.response.MessageResponse;
 import com.tunisys.TimeSheetPfe.DTOs.response.ProjectControllerResponseDto;
-import com.tunisys.TimeSheetPfe.DTOs.view.View;
 import com.tunisys.TimeSheetPfe.models.Project;
 import com.tunisys.TimeSheetPfe.models.UserModel;
 import com.tunisys.TimeSheetPfe.services.projectService.ProjectService;
@@ -61,6 +61,33 @@ public class ProjectsController {
                 employees.add(employee);
             }
             project.setEmployees(employees);
+        }
+
+        return ResponseEntity.ok(projectService.save(project));
+    }
+
+    @PostMapping("/{id}/add-stuff")
+    public ResponseEntity<?> addStuffToProject(@PathVariable Long id,@Valid @RequestBody AddStaffDto dto){
+        Project project = projectService.getById(id);
+        // Assign manager if not already set and managerId is provided
+        if (project.getManager() == null && dto.getManagerId() != null) {
+            UserModel manager = userService.findById(dto.getManagerId());
+            if (project.getManager() != null) {
+                MessageResponse.badRequest("can not set the projet manager"); // Could return a custom error message instead
+            }
+            project.setManager(manager);
+        }
+
+        // Add employees to the project
+        if (dto.getEmployeesIds() != null && !dto.getEmployeesIds().isEmpty()) {
+            List<UserModel> employees = dto.getEmployeesIds().stream()
+                    .map(employeeId ->
+                         userService.findById(employeeId)
+                    )
+                    .toList();
+
+            // Assuming Project has a method to add employees (e.g., a List<UserModel> employees)
+            project.getEmployees().addAll(employees);
         }
 
         return ResponseEntity.ok(projectService.save(project));

@@ -28,7 +28,7 @@ public class Project {
     @JsonView(View.Base.class)
     private LocalDate deadline;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "manager_id")
     @JsonView(View.External.class)
     private UserModel manager;
