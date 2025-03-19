@@ -65,6 +65,8 @@ public class TasksController {
         return taskService.getAll();
     }
 
+
+
 //    @GetMapping
 //    @PreAuthorize("hasRole('ROLE_MANAGER')")
 //    @JsonView(View.Base.class)

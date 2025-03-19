@@ -1,10 +1,12 @@
 package com.tunisys.TimeSheetPfe.controllers;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.tunisys.TimeSheetPfe.DTOs.request.AddStaffDto;
 import com.tunisys.TimeSheetPfe.DTOs.request.ProjectDtoRequest;
-import com.tunisys.TimeSheetPfe.DTOs.response.CurrentProjectResponse;
+import com.tunisys.TimeSheetPfe.DTOs.response.CurrentProjectInfo;
 import com.tunisys.TimeSheetPfe.DTOs.response.MessageResponse;
 import com.tunisys.TimeSheetPfe.DTOs.response.ProjectControllerResponseDto;
+import com.tunisys.TimeSheetPfe.DTOs.view.View;
 import com.tunisys.TimeSheetPfe.models.Project;
 import com.tunisys.TimeSheetPfe.models.UserModel;
 import com.tunisys.TimeSheetPfe.services.projectService.ProjectService;
@@ -96,11 +98,18 @@ public class ProjectsController {
         return ResponseEntity.ok(projectService.save(project));
     }
 
-    @GetMapping("/current")
-    @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_USER')")
-    public ResponseEntity<?> getCurrentProject() {
-        UserModel user = userService.findById(tokenUtils.extractUser().getId());
+//    @GetMapping("/current")
+//    @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_USER')")
+//    public ResponseEntity<?> getCurrentProject() {
+//        UserModel user = userService.findById(tokenUtils.extractUser().getId());
+//
+//        return ResponseEntity.ok(modelMapper.map(user.getCurrentProject(), CurrentProjectResponse.class));
+//    }
 
-        return ResponseEntity.ok(modelMapper.map(user.getCurrentProject(), CurrentProjectResponse.class));
+    @GetMapping("/current")
+    public ResponseEntity<CurrentProjectInfo> getCurrentProjectTask(){
+        UserModel userModel = userService.findById(tokenUtils.ExtractId());
+        return ResponseEntity.ok(CurrentProjectInfo.fromProject(userModel.getCurrentProject(),userModel));
+
     }
 }
