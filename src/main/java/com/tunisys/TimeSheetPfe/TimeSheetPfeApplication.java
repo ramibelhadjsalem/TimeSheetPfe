@@ -18,6 +18,7 @@ public class TimeSheetPfeApplication {
 
 	@Autowired
 	private PasswordEncoder encoder;
+
 	public static void main(String[] args) {
 		SpringApplication.run(TimeSheetPfeApplication.class, args);
 	}
@@ -32,9 +33,9 @@ public class TimeSheetPfeApplication {
 				roleRepository.save(new Role(null, ERole.ROLE_MANAGER));
 				roleRepository.save(new Role(null,ERole.ROLE_EMPLOYEE));
 			}
-			if(!userRepository.existsByEmail("yassin2016.attoui@gmail.com")){
+			if(!userRepository.existsByEmail("admin@gmail.com")){
 				UserModel user = new UserModel(
-						"yassin2016.attoui@gmail.com",
+						"admin@gmail.com",
 						encoder.encode("password")
 				);
 
@@ -46,6 +47,7 @@ public class TimeSheetPfeApplication {
 			}
 		};
 	}
+
 	@Bean
 	public ModelMapper modelMapper(){
 		return new ModelMapper();

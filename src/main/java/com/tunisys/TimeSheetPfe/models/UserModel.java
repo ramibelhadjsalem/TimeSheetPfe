@@ -52,6 +52,11 @@ public class UserModel {
     @JsonBackReference()
     private Set<Task> tasks = new HashSet<>();
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "current_project_id")
+    @JsonView(View.Base.class)
+    private Project currentProject;
+
     public UserModel(String email, String password) {
         this.email = email;
         this.password = password;

@@ -3,7 +3,6 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.tunisys.TimeSheetPfe.DTOs.view.View;
 import jakarta.persistence.*;

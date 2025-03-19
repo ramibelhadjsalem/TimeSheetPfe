@@ -7,6 +7,7 @@ import com.tunisys.TimeSheetPfe.models.*;
 import com.tunisys.TimeSheetPfe.services.projectService.ProjectService;
 import com.tunisys.TimeSheetPfe.services.taskService.TaskService;
 import com.tunisys.TimeSheetPfe.services.userService.UserService;
+import com.tunisys.TimeSheetPfe.utils.TokenUtils;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -25,9 +26,11 @@ public class TasksController {
 
     @Autowired
     private UserService userService;
+    @Autowired private TokenUtils tokenUtils;
 
     @Autowired
     private ProjectService projectService;
+
     @PostMapping
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')")
     @JsonView(View.Base.class)
@@ -61,4 +64,15 @@ public class TasksController {
     public List<Task> findAll(){
         return taskService.getAll();
     }
+
+//    @GetMapping
+//    @PreAuthorize("hasRole('ROLE_MANAGER')")
+//    @JsonView(View.Base.class)
+//    public List<Task> findAllByManager(){
+//
+//        UserModel userModel = userService.findById(tokenUtils.extractUser().getId());
+//
+//    }
+
 }
+
