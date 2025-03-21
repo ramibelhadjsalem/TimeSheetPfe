@@ -37,6 +37,7 @@ public class CurrentProjectInfo {
         private String priority;
         private String difficulty;
         private Set<User> employees;
+        private LocalDate deadline ;
 
         public static TaskProjectDto fromTask(Task task) {
             return TaskProjectDto.builder()
@@ -49,6 +50,7 @@ public class CurrentProjectInfo {
                     .employees(task.getEmployees().stream()
                             .map(User::fromUser)
                             .collect(Collectors.toSet()))
+                    .deadline(task.getDeadline())
                     .build();
         }
     }
