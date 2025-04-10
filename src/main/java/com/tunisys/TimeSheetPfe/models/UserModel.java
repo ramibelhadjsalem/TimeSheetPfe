@@ -14,6 +14,9 @@ import java.util.Set;
 
 @Entity
 @Table(name = "users")
+@NamedQueries({
+        @NamedQuery(name = "UserModel.findAll", query = "select u from UserModel u")
+})
 @Builder
 @Getter
 @Setter
@@ -47,7 +50,7 @@ public class UserModel {
     @JsonView(View.Base.class)
     private Set<Role> roles = new HashSet<>();
 
-    @ManyToMany(mappedBy = "employees", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "employees", fetch = FetchType.EAGER)
     @JsonView(View.Base.class)
     @JsonBackReference()
     private Set<Task> tasks = new HashSet<>();

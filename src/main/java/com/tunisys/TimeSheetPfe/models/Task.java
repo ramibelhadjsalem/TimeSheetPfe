@@ -71,6 +71,9 @@ public class Task {
     private LocalDate deadline;
 
 
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<TimeSheet> timesheetEntries;
+
     public void addEmployee(UserModel user) {
         this.employees.add(user);
     }

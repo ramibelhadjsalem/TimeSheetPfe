@@ -15,6 +15,7 @@ public class AdminController {
     UserService userService ;
 
     @PostMapping("/create-user")
+    // todo add role
     public ResponseEntity<?> createUser(@Valid @RequestBody CreateUserDto dto) {
 
         if (userService.existsByEmail(dto.getEmail())){

@@ -6,6 +6,7 @@ import com.tunisys.TimeSheetPfe.repositories.ProjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -29,6 +30,14 @@ public class ProjectService {
 
     public void deleteById(Long id){
          repository.deleteById(id);
+    }
+
+    public List<Project> findByDeadline(LocalDate today) {
+        return repository.findByDeadline(today);
+    }
+
+    public List<Project> findByDeadlineBetween(LocalDate startDate, LocalDate endDate) {
+        return repository.findByDeadlineBetween(startDate, endDate);
     }
 
 }

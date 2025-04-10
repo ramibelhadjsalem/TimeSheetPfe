@@ -35,7 +35,7 @@ public class EmployeesController {
     }
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(@PathVariable("id") Long id){
-        return ResponseEntity.ok(userService.findById(id));
+        return ResponseEntity.ok(modelMapper.map(userService.findById(id), EmployeesGetAllDto.class));
     }
 
     @DeleteMapping("/{id}")

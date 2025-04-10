@@ -67,14 +67,7 @@ public class TasksController {
 
 
 
-//    @GetMapping
-//    @PreAuthorize("hasRole('ROLE_MANAGER')")
-//    @JsonView(View.Base.class)
-//    public List<Task> findAllByManager(){
-//
-//        UserModel userModel = userService.findById(tokenUtils.extractUser().getId());
-//
-//    }
+
 
 }
 

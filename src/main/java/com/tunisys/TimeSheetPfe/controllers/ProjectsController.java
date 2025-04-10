@@ -98,13 +98,7 @@ public class ProjectsController {
         return ResponseEntity.ok(projectService.save(project));
     }
 
-//    @GetMapping("/current")
-//    @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_USER')")
-//    public ResponseEntity<?> getCurrentProject() {
-//        UserModel user = userService.findById(tokenUtils.extractUser().getId());
-//
-//        return ResponseEntity.ok(modelMapper.map(user.getCurrentProject(), CurrentProjectResponse.class));
-//    }
+
 
     @GetMapping("/current")
     public ResponseEntity<CurrentProjectInfo> getCurrentProjectTask(){

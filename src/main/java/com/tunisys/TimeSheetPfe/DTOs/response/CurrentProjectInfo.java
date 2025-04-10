@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -22,6 +23,7 @@ public class CurrentProjectInfo {
     private String description;
     private LocalDate deadline;
     private User manager;
+    private List<User> team;
     private Set<TaskProjectDto> allTasks;
     private Set<TaskProjectDto> ownTasks;
 
@@ -66,6 +68,7 @@ public class CurrentProjectInfo {
         private String phone;
         private String imgUrl;
 
+
         public static User fromUser(UserModel user) {
             return User.builder()
                     .id(user.getId())
@@ -90,6 +93,9 @@ public class CurrentProjectInfo {
                 .ownTasks(user.getTasks().stream()
                         .map(TaskProjectDto::fromTask)
                         .collect(Collectors.toSet()))
+                .team(project.getEmployees().stream()
+                        .map(User::fromUser)
+                        .collect(Collectors.toList()))
                 .build();
     }
 }
