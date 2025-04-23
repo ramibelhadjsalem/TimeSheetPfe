@@ -2,6 +2,8 @@ package com.tunisys.TimeSheetPfe.controllers;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.tunisys.TimeSheetPfe.DTOs.request.TaskDto;
+import com.tunisys.TimeSheetPfe.DTOs.response.ProjectControllerResponseDto;
+import com.tunisys.TimeSheetPfe.DTOs.response.TaskResponseDto;
 import com.tunisys.TimeSheetPfe.DTOs.view.View;
 import com.tunisys.TimeSheetPfe.models.*;
 import com.tunisys.TimeSheetPfe.services.projectService.ProjectService;
@@ -26,7 +28,8 @@ public class TasksController {
 
     @Autowired
     private UserService userService;
-    @Autowired private TokenUtils tokenUtils;
+    @Autowired
+    private TokenUtils tokenUtils;
 
     @Autowired
     private ProjectService projectService;
@@ -61,13 +64,19 @@ public class TasksController {
     @GetMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @JsonView(View.Base.class)
-    public List<Task> findAll(){
+    public List<Task> findAll() {
         return taskService.getAll();
     }
 
 
+    @GetMapping("/employee")
+    public List<TaskResponseDto> getTaskByCurrentUserAndProject() {
+        UserModel user = userService.findById(tokenUtils.ExtractId());
 
+        return taskService.getTasksByUserIdAndProjectId(user.getId(), user.getCurrentProject().getId())
+                .stream()
+                .map(TaskResponseDto::from)
+                .toList();
 
-
+    }
 }
-

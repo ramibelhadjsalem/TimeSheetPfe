@@ -40,4 +40,8 @@ public class ProjectService {
         return repository.findByDeadlineBetween(startDate, endDate);
     }
 
+    public List<Project> findByManagerId(Long managerId) {
+        return repository.findByManagerId(managerId);
+    }
+
 }

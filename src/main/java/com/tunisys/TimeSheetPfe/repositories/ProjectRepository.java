@@ -15,4 +15,7 @@ public interface ProjectRepository extends JpaRepository<Project,Long> {
 
     @Query("SELECT p FROM Project p WHERE p.deadline BETWEEN :startDate AND :endDate")
     List<Project> findByDeadlineBetween(LocalDate startDate, LocalDate endDate);
+
+    
+    List<Project> findByManagerId(Long managerId);
 }

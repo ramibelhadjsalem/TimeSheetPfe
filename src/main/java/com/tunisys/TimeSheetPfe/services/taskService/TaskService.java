@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -35,5 +36,10 @@ public class TaskService {
 
     public List<Task> findByDeadlineBetween(LocalDate today, LocalDate endDate) {
         return repository.findByDeadlineBetween(today, endDate);
+    }
+
+    public List<Task> getTasksByUserIdAndProjectId(Long userId, Long projectId) {
+
+        return  repository.findByProjectIdAndEmployeeId(userId, projectId);
     }
 }

@@ -10,13 +10,12 @@ import com.tunisys.TimeSheetPfe.services.userService.PasswordService;
 import com.tunisys.TimeSheetPfe.services.userService.UserService;
 import com.tunisys.TimeSheetPfe.utils.TokenUtils;
 import jakarta.annotation.security.PermitAll;
-import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
+
 
 @RestController
 @RequestMapping("/api/account")

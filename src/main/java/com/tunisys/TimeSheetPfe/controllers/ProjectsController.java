@@ -1,12 +1,12 @@
 package com.tunisys.TimeSheetPfe.controllers;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.google.cloud.storage.Acl.User;
 import com.tunisys.TimeSheetPfe.DTOs.request.AddStaffDto;
 import com.tunisys.TimeSheetPfe.DTOs.request.ProjectDtoRequest;
 import com.tunisys.TimeSheetPfe.DTOs.response.CurrentProjectInfo;
 import com.tunisys.TimeSheetPfe.DTOs.response.MessageResponse;
 import com.tunisys.TimeSheetPfe.DTOs.response.ProjectControllerResponseDto;
-import com.tunisys.TimeSheetPfe.DTOs.view.View;
 import com.tunisys.TimeSheetPfe.models.Project;
 import com.tunisys.TimeSheetPfe.models.UserModel;
 import com.tunisys.TimeSheetPfe.services.projectService.ProjectService;
@@ -24,6 +24,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api/projects")
@@ -31,14 +33,16 @@ public class ProjectsController {
 
     @Autowired
     ProjectService projectService;
-    @Autowired private ModelMapper modelMapper;
+    @Autowired
+    private ModelMapper modelMapper;
 
-    @Autowired UserService userService;
-    @Autowired private TokenUtils tokenUtils;
-
+    @Autowired
+    UserService userService;
+    @Autowired
+    private TokenUtils tokenUtils;
 
     @GetMapping
-    public List<ProjectControllerResponseDto> findAll(){
+    public List<ProjectControllerResponseDto> findAll() {
 
         List<Project> projects = projectService.getAll();
 
@@ -46,11 +50,11 @@ public class ProjectsController {
                 .map(project -> modelMapper.map(project, ProjectControllerResponseDto.class))
                 .collect(Collectors.toList());
     }
+
     @PostMapping
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')")
-    public ResponseEntity<?> createNewProject(@Valid @RequestBody ProjectDtoRequest dto){
+    public ResponseEntity<?> createNewProject(@Valid @RequestBody ProjectDtoRequest dto) {
         Project project = Project.builder()
-                .name(dto.getName())
                 .description(dto.getDescription())
                 .deadline(dto.getDeadline())
                 .tasks(Collections.emptySet())
@@ -72,13 +76,14 @@ public class ProjectsController {
     }
 
     @PostMapping("/{id}/add-stuff")
-    public ResponseEntity<?> addStuffToProject(@PathVariable Long id,@Valid @RequestBody AddStaffDto dto){
+    public ResponseEntity<?> addStuffToProject(@PathVariable Long id, @Valid @RequestBody AddStaffDto dto) {
         Project project = projectService.getById(id);
         // Assign manager if not already set and managerId is provided
         if (project.getManager() == null && dto.getManagerId() != null) {
             UserModel manager = userService.findById(dto.getManagerId());
             if (project.getManager() != null) {
-                MessageResponse.badRequest("can not set the projet manager"); // Could return a custom error message instead
+                MessageResponse.badRequest("can not set the projet manager"); // Could return a custom error message
+                                                                              // instead
             }
             project.setManager(manager);
         }
@@ -86,24 +91,32 @@ public class ProjectsController {
         // Add employees to the project
         if (dto.getEmployeesIds() != null && !dto.getEmployeesIds().isEmpty()) {
             List<UserModel> employees = dto.getEmployeesIds().stream()
-                    .map(employeeId ->
-                         userService.findById(employeeId)
-                    )
+                    .map(employeeId -> userService.findById(employeeId))
                     .toList();
 
-            // Assuming Project has a method to add employees (e.g., a List<UserModel> employees)
+            // Assuming Project has a method to add employees (e.g., a List<UserModel>
+            // employees)
             project.getEmployees().addAll(employees);
         }
 
         return ResponseEntity.ok(projectService.save(project));
     }
 
-
-
     @GetMapping("/current")
-    public ResponseEntity<CurrentProjectInfo> getCurrentProjectTask(){
+    public ResponseEntity<CurrentProjectInfo> getCurrentProjectTask() {
         UserModel userModel = userService.findById(tokenUtils.ExtractId());
-        return ResponseEntity.ok(CurrentProjectInfo.fromProject(userModel.getCurrentProject(),userModel));
+        return ResponseEntity.ok(CurrentProjectInfo.fromProject(userModel.getCurrentProject(), userModel));
 
     }
+
+    @GetMapping("/manager")
+    public ResponseEntity<?> getProjectByManager() {
+        UserModel userModel = userService.findById(tokenUtils.ExtractId());
+        List<Project> projects = projectService.findByManagerId(userModel.getId());
+
+        return ResponseEntity.ok(projects.stream()
+                .map(project -> modelMapper.map(project, ProjectControllerResponseDto.class))
+                .collect(Collectors.toList()));
+    }
+
 }
