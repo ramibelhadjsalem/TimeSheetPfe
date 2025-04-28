@@ -6,6 +6,7 @@ import com.tunisys.TimeSheetPfe.DTOs.response.ProjectControllerResponseDto;
 import com.tunisys.TimeSheetPfe.DTOs.response.TaskResponseDto;
 import com.tunisys.TimeSheetPfe.DTOs.view.View;
 import com.tunisys.TimeSheetPfe.models.*;
+import com.tunisys.TimeSheetPfe.services.notificationService.NotificationService;
 import com.tunisys.TimeSheetPfe.services.projectService.ProjectService;
 import com.tunisys.TimeSheetPfe.services.taskService.TaskService;
 import com.tunisys.TimeSheetPfe.services.userService.UserService;
@@ -25,7 +26,8 @@ public class TasksController {
 
     @Autowired
     private TaskService taskService;
-
+    @Autowired
+    private NotificationService notificationService;
     @Autowired
     private UserService userService;
     @Autowired
@@ -57,8 +59,18 @@ public class TasksController {
                     .map(userService::findById) // Find each user by ID
                     .forEach(task::addEmployee); // Add the user to the task
         }
+        Task newTask =taskService.Save(task);
+        newTask.getEmployees().forEach(employee -> {
+            notificationService.createAndSendNotification(
+                    employee.getId(),
+                    "New Task assigned with id: " +newTask.getId(),
+                    "You have been assigned to a new task: " + newTask.getDescription(),
+                    "task/"+newTask.getId(),
+                    NotificationType.INFO
+            );
+        });
 
-        return ResponseEntity.ok(taskService.Save(task));
+        return ResponseEntity.ok(newTask);
     }
 
     @GetMapping

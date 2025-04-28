@@ -7,8 +7,10 @@ import com.tunisys.TimeSheetPfe.DTOs.request.ProjectDtoRequest;
 import com.tunisys.TimeSheetPfe.DTOs.response.CurrentProjectInfo;
 import com.tunisys.TimeSheetPfe.DTOs.response.MessageResponse;
 import com.tunisys.TimeSheetPfe.DTOs.response.ProjectControllerResponseDto;
+import com.tunisys.TimeSheetPfe.models.NotificationType;
 import com.tunisys.TimeSheetPfe.models.Project;
 import com.tunisys.TimeSheetPfe.models.UserModel;
+import com.tunisys.TimeSheetPfe.services.notificationService.NotificationService;
 import com.tunisys.TimeSheetPfe.services.projectService.ProjectService;
 import com.tunisys.TimeSheetPfe.services.userService.UserService;
 import com.tunisys.TimeSheetPfe.utils.TokenUtils;
@@ -33,6 +35,8 @@ public class ProjectsController {
 
     @Autowired
     ProjectService projectService;
+
+    @Autowired private NotificationService notificationService;
     @Autowired
     private ModelMapper modelMapper;
 
@@ -71,8 +75,18 @@ public class ProjectsController {
             }
             project.setEmployees(employees);
         }
+        Project newProject = projectService.save(project);
+        newProject.getEmployees().forEach(employee -> {
+            notificationService.createAndSendNotification(
+                    employee.getId(),
+                    "New project assigned with id: " +newProject.getId(),
+                    "You have been assigned to a new project: " + project.getDescription(),
+                    "project/"+newProject.getId(),
+                    NotificationType.INFO
+                    );
+        });
 
-        return ResponseEntity.ok(projectService.save(project));
+        return ResponseEntity.ok(newProject);
     }
 
     @PostMapping("/{id}/add-stuff")
@@ -93,10 +107,17 @@ public class ProjectsController {
             List<UserModel> employees = dto.getEmployeesIds().stream()
                     .map(employeeId -> userService.findById(employeeId))
                     .toList();
-
-            // Assuming Project has a method to add employees (e.g., a List<UserModel>
-            // employees)
             project.getEmployees().addAll(employees);
+
+            project.getEmployees().forEach(employee -> {
+                notificationService.createAndSendNotification(
+                        employee.getId(),
+                        "New project assigned with id: " +project.getId(),
+                        "You have been assigned to a new project: " + project.getDescription(),
+                        "project/"+project.getId(),
+                        NotificationType.INFO
+                );
+            });
         }
 
         return ResponseEntity.ok(projectService.save(project));
@@ -110,7 +131,7 @@ public class ProjectsController {
     }
 
 
-    
+
     @GetMapping("/manager")
     public ResponseEntity<?> getProjectByManager() {
         UserModel userModel = userService.findById(tokenUtils.ExtractId());
