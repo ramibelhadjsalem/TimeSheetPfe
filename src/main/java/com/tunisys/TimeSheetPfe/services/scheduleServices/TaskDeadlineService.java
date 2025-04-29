@@ -34,7 +34,7 @@ public class TaskDeadlineService {
     }
 
 //    @Scheduled(cron = "0 0 * 8-16 * MON-FRI")
-@Scheduled(cron = "0 * * * * *")
+//@Scheduled(cron = "0 * * * * *")
     @Transactional(readOnly = true)
     public void checkTaskDeadlines() {
         LocalDate today = LocalDate.now();
