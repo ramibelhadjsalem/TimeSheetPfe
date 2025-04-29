@@ -44,6 +44,14 @@ public class TimeSheetController {
                 ) .collect(Collectors.toList());
 
     }
+    @GetMapping("/current")
+    public List<TimeSheetResponseDto> findByCurrentUser(){
+        Long id = tokenUtils.ExtractId();
+        return timeSheetService.findByUserId(id).stream()
+                .map(ts -> modelMapper.map(ts, TimeSheetResponseDto.class)
+                ) .collect(Collectors.toList());
+
+    }
 
 
     @PostMapping

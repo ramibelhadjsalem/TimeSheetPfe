@@ -42,4 +42,11 @@ public class NotificationController {
         String response = notificationService.sendFcmNotification(token, title, body);
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/seen")
+    public List<Notification> markAsSeen() {
+        Long userId = tokenUtils.ExtractId();
+        return notificationService.markAsSeen(userId);
+    }
+
 }

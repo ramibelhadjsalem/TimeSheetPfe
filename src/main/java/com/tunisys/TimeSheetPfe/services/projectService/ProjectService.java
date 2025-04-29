@@ -3,6 +3,7 @@ package com.tunisys.TimeSheetPfe.services.projectService;
 import com.tunisys.TimeSheetPfe.exceptions.EntityNotFoundException;
 import com.tunisys.TimeSheetPfe.models.Project;
 import com.tunisys.TimeSheetPfe.repositories.ProjectRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,6 +43,19 @@ public class ProjectService {
 
     public List<Project> findByManagerId(Long managerId) {
         return repository.findByManagerId(managerId);
+    }
+
+    @Transactional
+    public void deleteProject(Long projectId) {
+        // Find the project
+        Project project = repository.findById(projectId)
+                .orElseThrow(() -> new IllegalArgumentException("Project not found with ID: " + projectId));
+
+        // Prepare the project for deletion (detach relationships)
+        project.prepareForDeletion();
+
+        // Delete the project (cascades to tasks and timesheets)
+        repository.delete(project);
     }
 
 }

@@ -2,6 +2,7 @@ package com.tunisys.TimeSheetPfe.controllers;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.tunisys.TimeSheetPfe.DTOs.request.TaskDto;
+import com.tunisys.TimeSheetPfe.DTOs.request.UpdateTaskStatusDto;
 import com.tunisys.TimeSheetPfe.DTOs.response.ProjectControllerResponseDto;
 import com.tunisys.TimeSheetPfe.DTOs.response.TaskResponseDto;
 import com.tunisys.TimeSheetPfe.DTOs.view.View;
@@ -90,5 +91,90 @@ public class TasksController {
                 .map(TaskResponseDto::from)
                 .toList();
 
+    }
+
+    // Route for EMPLOYEE to update own task status
+    @PutMapping("/{taskId}/employee")
+    public ResponseEntity<?> updateTaskStatusByEmployee(
+            @PathVariable Long taskId,
+            @Valid @RequestBody UpdateTaskStatusDto dto) {
+        Long userId = tokenUtils.ExtractId();
+        Task task = taskService.getById(taskId);
+        // 🔥 Check if employee is part of assigned employees
+        boolean isAssigned = task.getEmployees().stream()
+                .anyMatch(user -> user.getId().equals(userId));
+
+        if (!isAssigned) {
+            return ResponseEntity.status(403).body("You are not assigned to this task.");
+        }
+
+        EStatus currentStatus = task.getStatus();
+        EStatus requestedStatus = dto.getStatus();
+
+        // 🔥 Business logic for employee:
+        if (currentStatus == EStatus.IMPROVED) {
+            return ResponseEntity.badRequest().body("Task is already approved. Cannot modify.");
+        }
+
+        if (currentStatus == EStatus.DISAPPROVED) {
+            if (requestedStatus == EStatus.PROGRESS) {
+                task.setStatus(EStatus.PROGRESS);
+            } else {
+                return ResponseEntity.badRequest().body("When disapproved, you can only set to PROGRESS.");
+            }
+        } else if (currentStatus == EStatus.NOT_STARTED && requestedStatus == EStatus.PROGRESS) {
+            task.setStatus(EStatus.PROGRESS);
+        } else if (currentStatus == EStatus.PROGRESS && requestedStatus == EStatus.FINISHED) {
+            task.setStatus(EStatus.FINISHED);
+        } else {
+            return ResponseEntity.badRequest().body("Invalid status transition for employee.");
+        }
+
+        taskService.save(task);
+        UserModel model =task.getProject().getManager();
+        if(model != null){
+            notificationService.createAndSendNotification(
+                    model.getId(),
+                    "Task status updated with id: " + task.getId(),
+                    "Task status updated to: " + task.getStatus(),
+                    "task/" + task.getId(),
+                    NotificationType.INFO
+            );
+        }
+        return ResponseEntity.ok("Task status updated successfully by employee.");
+    }
+
+    // Route for MANAGER to approve/disapprove
+    @PutMapping("/{taskId}/manager")
+    public ResponseEntity<?> updateTaskStatusByManager(
+            @PathVariable Long taskId,
+            @Valid @RequestBody UpdateTaskStatusDto dto) {
+
+        Task task = taskService.getById(taskId);
+        if (task == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        EStatus requestedStatus = dto.getStatus();
+
+        // 🔥 Business logic for manager:
+        if (requestedStatus == EStatus.IMPROVED || requestedStatus == EStatus.DISAPPROVED) {
+            task.setStatus(requestedStatus);
+            taskService.save(task);
+
+
+            task.getEmployees().forEach(employee -> {
+                notificationService.createAndSendNotification(
+                        employee.getId(),
+                        "Task status updated with id: " + task.getId(),
+                        "Task status updated to: " + task.getStatus(),
+                        "task/" + task.getId(),
+                        task.getStatus().equals(EStatus.IMPROVED) ? NotificationType.INFO : NotificationType.WARNING
+                );
+            });
+            return ResponseEntity.ok("Task status updated successfully by manager.");
+        } else {
+            return ResponseEntity.badRequest().body("Manager can only approve or disapprove a task.");
+        }
     }
 }

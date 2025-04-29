@@ -62,10 +62,10 @@ public class Task {
     @JsonView(View.Base.class)
     private Project project;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "manager_id", referencedColumnName = "id")
-    @JsonView(View.Base.class) // Include the manager in external views
-    private UserModel manager ;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "manager_id", referencedColumnName = "id")
+//    @JsonView(View.Base.class) // Include the manager in external views
+//    private UserModel manager ;
 
     @JsonView(View.Base.class)
     private LocalDate deadline;
@@ -76,6 +76,27 @@ public class Task {
 
     public void addEmployee(UserModel user) {
         this.employees.add(user);
+    }
+
+    public void prepareForDeletion() {
+        // Detach from employees
+        for (UserModel employee : employees) {
+            employee.getTasks().remove(this); // Remove this task from user's tasks
+        }
+        employees.clear();
+
+//        // Detach from manager
+//        if (manager != null) {
+//            manager = null;
+//        }
+
+        // Detach from project
+        if (project != null) {
+            project.getTasks().remove(this);
+            project = null;
+        }
+
+        // Note: timesheetEntries are automatically deleted due to cascade = CascadeType.ALL
     }
 }
 

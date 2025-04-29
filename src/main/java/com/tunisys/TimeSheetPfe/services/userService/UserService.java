@@ -22,6 +22,7 @@ public class UserService implements IUserService{
     private EmailService emailService;
     @Autowired
     private RoleService roleService;
+    private UserModel user;
 
     @Override
     public UserModel saveUser(UserModel user) {
@@ -53,12 +54,25 @@ public class UserService implements IUserService{
     }
 
     @Override
-    public UserModel createUserAndSendEmail(String email, ERole role,String name,String phone) {
+    public UserModel createUserAndSendEmail(
+            String email,
+            ERole role,
+            String firstName,
+            String phone,
+            String lastName,
+            String cin,
+            String department,
+            Integer experience
+    ) {
         String generatedPassword =passwordService.generateRandomPassword();
         String encodedPassword = passwordService.encodePassword(generatedPassword);
-        UserModel user = new UserModel(email,encodedPassword);
-        user.setName(name);
+        user = new UserModel(email,encodedPassword);
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
         user.setPhone(phone);
+        user.setCin(cin);
+        user.setDepartment(department);
+        user.setExperience(experience);
         Role userRole = roleService.findRoleByName(role);
         user.getRoles().add(userRole);
 

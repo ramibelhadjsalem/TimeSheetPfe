@@ -42,4 +42,8 @@ public class TaskService {
 
         return  repository.findByProjectIdAndEmployeeId(userId, projectId);
     }
+
+    public Task save(Task task) {
+        return repository.save(task);
+    }
 }

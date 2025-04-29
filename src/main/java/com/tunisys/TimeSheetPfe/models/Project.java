@@ -44,6 +44,31 @@ public class Project {
     private Set<Task> tasks = new HashSet<>();
 
 
+    // Helper method to prepare for deletion
+    public void prepareForDeletion() {
+        // Clear tasks and their relationships
+        for (Task task : tasks) {
+            task.prepareForDeletion(); // Call Task's cleanup method
+        }
+        tasks.clear();
+
+        // Detach from employees
+        for (UserModel employee : employees) {
+            if (employee.getCurrentProject() != null && employee.getCurrentProject().getId().equals(this.id)) {
+                employee.setCurrentProject(null); // Remove project reference
+            }
+        }
+        employees.clear();
+
+        // Detach from manager
+        if (manager != null) {
+            if (manager.getCurrentProject() != null && manager.getCurrentProject().getId().equals(this.id)) {
+                manager.setCurrentProject(null);
+            }
+            manager = null;
+        }
+    }
+
 
 }
 

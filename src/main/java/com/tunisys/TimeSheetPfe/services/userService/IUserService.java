@@ -21,7 +21,16 @@ public interface IUserService {
 
     UserModel findByEmail(String email);
 
-    UserModel createUserAndSendEmail(String email, ERole role,String name,String phone);
+    UserModel createUserAndSendEmail(
+            String email,
+            ERole role,
+            String firstName,
+            String phone,
+            String lastName,
+            String cin,
+            String department,
+            Integer experience
+            );
 
     List<UserModel> getUsersByRoles(List<ERole> roleNames);
 }

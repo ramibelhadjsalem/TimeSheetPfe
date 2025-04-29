@@ -15,13 +15,21 @@ public class AdminController {
     UserService userService ;
 
     @PostMapping("/create-user")
-    // todo add role
     public ResponseEntity<?> createUser(@Valid @RequestBody CreateUserDto dto) {
 
         if (userService.existsByEmail(dto.getEmail())){
             return MessageResponse.badRequest("User exist with that email");
         }
-        userService.createUserAndSendEmail(dto.getEmail(), dto.getRole(),dto.getName(),dto.getPhoneNumber());
+        userService.createUserAndSendEmail(
+                dto.getEmail(),
+                dto.getRole(),
+                dto.getFirstName(),
+                dto.getPhoneNumber(),
+                dto.getLastName(),
+                dto.getCin(),
+                dto.getDepartment(),
+                dto.getExperience()
+                );
         return MessageResponse.ok("User created successfully");
     }
 }

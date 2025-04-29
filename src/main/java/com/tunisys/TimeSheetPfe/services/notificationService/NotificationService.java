@@ -9,6 +9,7 @@ import com.tunisys.TimeSheetPfe.repositories.ConnectionRepository;
 import com.tunisys.TimeSheetPfe.repositories.NotificationRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -88,5 +89,21 @@ public class NotificationService {
 
         connectionRepository.deleteByUserIdAndToken(userId, fcmToken);
         log.info("FCM connection removed for user: {}", userId);
+    }
+
+    public List<Notification> markAsSeen(Long userId) {
+        // 1. Fetch all notifications for the user
+        List<Notification> notifications = notificationRepository.findByUserId(userId);
+
+        // 2. Update each notification's 'received' field to true
+        for (Notification notification : notifications) {
+            notification.setReceived(true);
+        }
+
+        // 3. Save all updated notifications
+        notificationRepository.saveAll(notifications);
+
+        // 4. Return updated notifications, ordered by createdAt descending
+        return notificationRepository.findByUserIdOrderByCreatedAtDesc(userId);
     }
 }

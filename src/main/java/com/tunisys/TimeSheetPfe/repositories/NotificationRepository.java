@@ -10,4 +10,7 @@ public interface NotificationRepository extends JpaRepository<Notification,Long>
 
     @Query("SELECT n FROM Notification n WHERE n.userId = ?1 ORDER BY n.createdAt DESC")
     List<Notification> findByUserId(Long userId);
+
+    @Query("select n from Notification n where n.userId = ?1 order by n.createdAt DESC")
+    List<Notification> findByUserIdOrderByCreatedAtDesc(Long userId);
 }

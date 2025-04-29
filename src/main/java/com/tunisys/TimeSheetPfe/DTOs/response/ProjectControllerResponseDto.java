@@ -45,7 +45,12 @@ public class ProjectControllerResponseDto {
         private String name;  // Employee Name
         private String email;  // Employee Email
         private String phone;  // Employee Phone Number
-        private String imgUrl;  // Employee Image URL (Optional)
+        private String imgUrl;
+        private String cin = "";  // Employee CIN
+        private String firstName = "";
+        private String lastName = "";
+        private String department = "";
+        private  Integer experience;
     }
 }
 

@@ -4,13 +4,11 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.tunisys.TimeSheetPfe.DTOs.view.View;
-import jakarta.persistence.Entity;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
-
 
 @Entity
 @Table(name = "users")
@@ -29,7 +27,18 @@ public class UserModel {
     private Long id;
 
     @JsonView(View.Base.class)
-    private String name;
+    @Column(name = "first_name")
+    private String firstName;
+
+    @JsonView(View.Base.class)
+    @Column(name = "last_name")
+    private String lastName;
+
+    @Transient
+    @JsonView(View.Base.class)
+    public String getName() {
+        return firstName + " " + lastName;
+    }
 
     @JsonIgnore
     private String password;
@@ -38,10 +47,22 @@ public class UserModel {
     private String phone;
 
     @JsonView(View.Base.class)
+    @Column(unique = true)
     private String email;
 
     @JsonView(View.Base.class)
+    @Column(name = "img_url")
     private String imgUrl;
+
+    @JsonView(View.Base.class)
+    @Column(name = "cin", unique = true, length = 8)
+    private String cin;
+
+    @JsonView(View.Base.class)
+    private String department;
+
+    @JsonView(View.Base.class)
+    private Integer experience;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles",

@@ -59,6 +59,7 @@ public class ProjectsController {
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')")
     public ResponseEntity<?> createNewProject(@Valid @RequestBody ProjectDtoRequest dto) {
         Project project = Project.builder()
+                .name(dto.getName())
                 .description(dto.getDescription())
                 .deadline(dto.getDeadline())
                 .tasks(Collections.emptySet())
@@ -86,7 +87,7 @@ public class ProjectsController {
                     );
         });
 
-        return ResponseEntity.ok(newProject);
+        return ResponseEntity.ok(modelMapper.map(newProject, ProjectControllerResponseDto.class));
     }
 
     @PostMapping("/{id}/add-stuff")
@@ -140,6 +141,13 @@ public class ProjectsController {
         return ResponseEntity.ok(projects.stream()
                 .map(project -> modelMapper.map(project, ProjectControllerResponseDto.class))
                 .collect(Collectors.toList()));
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_MANAGER')")
+    public ResponseEntity<Void> deleteProject(@PathVariable Long id) {
+        projectService.deleteProject(id);
+        return ResponseEntity.noContent().build();
     }
 
 }

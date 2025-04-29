@@ -72,7 +72,7 @@ public class TaskDeadlineService {
             }
 
             // Notify the manager (if exists)
-            UserModel manager = task.getManager();
+            UserModel manager = task.getProject().getManager();
             if (manager != null) {
                 String title = getNotificationTitle(notificationType, true);
                 String body = String.format(
