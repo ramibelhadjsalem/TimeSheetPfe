@@ -72,6 +72,7 @@ public class ProjectsController {
             Set<UserModel> employees = new HashSet<>();
             for (Long employeeId : dto.getEmployeeIds()) {
                 UserModel employee = userService.findById(employeeId);
+                employee.setCurrentProject(project);
                 employees.add(employee);
             }
             project.setEmployees(employees);
