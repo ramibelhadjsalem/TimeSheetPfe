@@ -1,4 +1,5 @@
 package com.tunisys.TimeSheetPfe.models;
+
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
@@ -32,17 +33,15 @@ public class Project {
     @JsonView(View.External.class)
     private UserModel manager;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "project_employees",
-            joinColumns = @JoinColumn(name = "project_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id"))
+    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH })
+    @JoinTable(name = "project_employees", joinColumns = @JoinColumn(name = "project_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     @JsonView(View.External.class)
+    @Builder.Default
     private Set<UserModel> employees = new HashSet<>();
 
-
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private Set<Task> tasks = new HashSet<>();
-
 
     // Helper method to prepare for deletion
     public void prepareForDeletion() {
@@ -69,7 +68,4 @@ public class Project {
         }
     }
 
-
 }
-
-

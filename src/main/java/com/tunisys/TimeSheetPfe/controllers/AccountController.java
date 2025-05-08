@@ -15,25 +15,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
-
 @RestController
 @RequestMapping("/api/account")
 public class AccountController {
 
-    @Autowired private UserService userService ;
-    @Autowired private EmailService emailService;
-    @Autowired private PasswordService passwordService;
-    @Autowired private TokenUtils tokenUtils;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private EmailService emailService;
+    @Autowired
+    private PasswordService passwordService;
+    @Autowired
+    private TokenUtils tokenUtils;
 
     @PostMapping("/reset-password")
     @PermitAll
-    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordDto dto){
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordDto dto) {
 
         UserModel user = userService.findByEmail(dto.getEmail());
         String newPassword = passwordService.generateRandomPassword();
         String encodedPassword = passwordService.encodePassword(newPassword);
-
 
         try {
             emailService.sendResetPassword(
@@ -42,23 +43,21 @@ public class AccountController {
                     "Password reseted successfully",
                     user.getName(),
                     user.getEmail(),
-                    newPassword
-            );
+                    newPassword);
             user.setPassword(encodedPassword);
             userService.saveUser(user);
             return MessageResponse.ok("Password rested successfully ,check the new password in the e-mail ");
         } catch (Exception e) {
-          return MessageResponse.badRequest("SomeThing went wrong");
+            return MessageResponse.badRequest("SomeThing went wrong");
         }
-
 
     }
 
     @GetMapping
     @JsonView(View.External.class)
-    public ResponseEntity<?> getProfile(){
-       UserModel user = userService.findById(tokenUtils.extractUser().getId());
+    public ResponseEntity<?> getProfile() {
+        UserModel user = userService.findById(tokenUtils.extractUser().getId());
 
-       return ResponseEntity.ok(user);
+        return ResponseEntity.ok(user);
     }
 }

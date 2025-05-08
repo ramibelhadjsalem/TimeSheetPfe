@@ -64,14 +64,14 @@ public class UserModel {
     @JsonView(View.Base.class)
     private Integer experience;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH })
+    @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     @JsonView(View.Base.class)
+    @Builder.Default
     private Set<Role> roles = new HashSet<>();
 
-    @ManyToMany(mappedBy = "employees", fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "employees", fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.DETACH })
     @JsonView(View.Base.class)
     @JsonBackReference()
     private Set<Task> tasks = new HashSet<>();
@@ -84,5 +84,28 @@ public class UserModel {
     public UserModel(String email, String password) {
         this.email = email;
         this.password = password;
+        this.roles = new HashSet<>();
+        this.tasks = new HashSet<>();
+    }
+
+    /**
+     * Prepares the user for deletion by cleaning up all relationships
+     * This helps avoid foreign key constraint violations
+     */
+    public void prepareForDeletion() {
+        // Remove from current project
+        if (currentProject != null) {
+            currentProject.getEmployees().remove(this);
+            currentProject = null;
+        }
+
+        // Remove from all tasks
+        for (Task task : new HashSet<>(tasks)) {
+            task.getEmployees().remove(this);
+        }
+        tasks.clear();
+
+        // Clear roles
+        roles.clear();
     }
 }

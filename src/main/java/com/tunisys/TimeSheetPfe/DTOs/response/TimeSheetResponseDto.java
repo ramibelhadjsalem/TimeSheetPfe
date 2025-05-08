@@ -21,22 +21,24 @@ public class TimeSheetResponseDto {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class User {  // Must be static
+    public static class User { // Must be static
         private Long id;
         private String name;
         private String email;
         private String phone;
         private String imgUrl;
     }
+
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
     public static class TaskDto {
-        private Long id;  // Task ID
-        private String title;  // Task Title
-        private String description;  // Task Description
-        private String status;  // Task Status
-        private String priority;  // Task Priority
-        private String difficulty;  // Task Difficulty
+        private Long id; // Task ID
+        private String title; // Task Title
+        private String description; // Task Description
+        private String status; // Task Status
+        private String priority; // Task Priority
+        private String difficulty; // Task Difficulty
+        private Long projectId; // Project ID
     }
 }

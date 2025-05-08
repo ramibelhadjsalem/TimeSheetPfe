@@ -23,7 +23,7 @@ public class CreateUserDto {
     private String lastName;
 
     @NotBlank(message = "Phone number is required")
-    @Pattern(regexp = "^[0-9]{10}$", message = "Phone number must be 10 digits")
+    @Pattern(regexp = "^[0-9]{8}$", message = "Phone number must be 8 digits")
     private String phoneNumber;
 
     @NotBlank(message = "CIN is required")

@@ -15,7 +15,7 @@ public class Notification {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String title;
-    private String body;
+    private String body; // description
     private String actionUrl;
     private boolean isReceived = false;
     private Long userId;

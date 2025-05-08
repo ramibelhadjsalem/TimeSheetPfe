@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/admin")
 public class AdminController {
     @Autowired
-    UserService userService ;
+    UserService userService;
 
     @PostMapping("/create-user")
     public ResponseEntity<?> createUser(@Valid @RequestBody CreateUserDto dto) {
 
-        if (userService.existsByEmail(dto.getEmail())){
+        if (userService.existsByEmail(dto.getEmail())) {
             return MessageResponse.badRequest("User exist with that email");
         }
         userService.createUserAndSendEmail(
@@ -28,8 +28,31 @@ public class AdminController {
                 dto.getLastName(),
                 dto.getCin(),
                 dto.getDepartment(),
-                dto.getExperience()
-                );
+                dto.getExperience());
         return MessageResponse.ok("User created successfully");
+    }
+
+    /**
+     * Deletes a user by their ID
+     * 
+     * @param id The ID of the user to delete
+     * @return A response entity with a success or error message
+     */
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        // Check if the user exists
+        if (!userService.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // Delete the user
+        boolean deleted = userService.deleteUser(id);
+
+        if (deleted) {
+            return ResponseEntity.ok(new MessageResponse("Utilisateur supprimé avec succès"));
+        } else {
+            return ResponseEntity.internalServerError()
+                    .body(new MessageResponse("Échec de la suppression de l'utilisateur"));
+        }
     }
 }

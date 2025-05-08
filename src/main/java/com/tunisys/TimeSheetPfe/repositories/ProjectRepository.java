@@ -7,8 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.time.LocalDate;
 import java.util.List;
 
-public interface ProjectRepository extends JpaRepository<Project,Long> {
-
+public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     @Query("select p from Project p where p.deadline = ?1")
     List<Project> findByDeadline(LocalDate today);
@@ -16,6 +15,8 @@ public interface ProjectRepository extends JpaRepository<Project,Long> {
     @Query("SELECT p FROM Project p WHERE p.deadline BETWEEN :startDate AND :endDate")
     List<Project> findByDeadlineBetween(LocalDate startDate, LocalDate endDate);
 
-    
     List<Project> findByManagerId(Long managerId);
+
+    @Query("SELECT p FROM Project p JOIN p.employees e WHERE e.id = :userId")
+    List<Project> findProjectsByEmployeeId(Long userId);
 }

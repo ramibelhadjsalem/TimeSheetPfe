@@ -26,4 +26,8 @@ public class TimeSheetService {
     public List<TimeSheet> findByUserId(Long userId){
         return timeSheetRepository.findByUserId(userId);
     }
+
+    public List<TimeSheet> findByUserIdAndCurrentProject(Long userId,Long currentProjectId){
+        return timeSheetRepository.findByUserIdAndProjectId(userId,currentProjectId);
+    }
 }

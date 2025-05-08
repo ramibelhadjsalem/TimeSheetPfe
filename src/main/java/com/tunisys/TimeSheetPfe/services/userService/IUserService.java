@@ -1,6 +1,5 @@
 package com.tunisys.TimeSheetPfe.services.userService;
 
-
 import com.tunisys.TimeSheetPfe.DTOs.request.StaffDTO;
 import com.tunisys.TimeSheetPfe.models.ERole;
 import com.tunisys.TimeSheetPfe.models.UserModel;
@@ -29,8 +28,15 @@ public interface IUserService {
             String lastName,
             String cin,
             String department,
-            Integer experience
-            );
+            Integer experience);
 
     List<UserModel> getUsersByRoles(List<ERole> roleNames);
+
+    /**
+     * Deletes a user by their ID
+     * 
+     * @param id The ID of the user to delete
+     * @return true if the user was successfully deleted, false otherwise
+     */
+    boolean deleteUser(Long id);
 }

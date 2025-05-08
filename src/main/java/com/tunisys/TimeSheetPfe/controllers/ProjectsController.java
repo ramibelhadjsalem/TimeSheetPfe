@@ -1,7 +1,5 @@
 package com.tunisys.TimeSheetPfe.controllers;
 
-import com.fasterxml.jackson.annotation.JsonView;
-import com.google.cloud.storage.Acl.User;
 import com.tunisys.TimeSheetPfe.DTOs.request.AddStaffDto;
 import com.tunisys.TimeSheetPfe.DTOs.request.ProjectDtoRequest;
 import com.tunisys.TimeSheetPfe.DTOs.response.CurrentProjectInfo;
@@ -15,7 +13,7 @@ import com.tunisys.TimeSheetPfe.services.projectService.ProjectService;
 import com.tunisys.TimeSheetPfe.services.userService.UserService;
 import com.tunisys.TimeSheetPfe.utils.TokenUtils;
 import jakarta.validation.Valid;
-import org.modelmapper.ModelMapper;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,8 +24,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api/projects")
@@ -36,9 +32,8 @@ public class ProjectsController {
     @Autowired
     ProjectService projectService;
 
-    @Autowired private NotificationService notificationService;
     @Autowired
-    private ModelMapper modelMapper;
+    private NotificationService notificationService;
 
     @Autowired
     UserService userService;
@@ -47,12 +42,26 @@ public class ProjectsController {
 
     @GetMapping
     public List<ProjectControllerResponseDto> findAll() {
-
         List<Project> projects = projectService.getAll();
+        UserModel currentUser = userService.findById(tokenUtils.ExtractId());
 
         return projects.stream()
-                .map(project -> modelMapper.map(project, ProjectControllerResponseDto.class))
+                .map(project -> ProjectControllerResponseDto.fromProject(project, currentUser))
                 .collect(Collectors.toList());
+    }
+
+    @GetMapping("/current/{userId}")
+    public ResponseEntity<?> getCurrentProject(@PathVariable Long userId) {
+        UserModel userModel = userService.findById(userId);
+        if (userModel.getCurrentProject() != null) {
+            ProjectControllerResponseDto projectDto = ProjectControllerResponseDto
+                    .fromProject(userModel.getCurrentProject(), userModel);
+            // This is definitely the current project for the user
+            projectDto.setCurrentProject(true);
+            return ResponseEntity.ok(projectDto);
+        } else {
+            return ResponseEntity.noContent().build();
+        }
     }
 
     @PostMapping
@@ -66,7 +75,9 @@ public class ProjectsController {
                 .employees(new HashSet<>())
                 .build();
         if (dto.getManagerId() != null) {
-            project.setManager(userService.findById(dto.getManagerId()));
+            UserModel manager = userService.findById(dto.getManagerId());
+            manager.setCurrentProject(project);
+            project.setManager(manager);
         }
         if (dto.getEmployeeIds() != null) {
             Set<UserModel> employees = new HashSet<>();
@@ -81,14 +92,16 @@ public class ProjectsController {
         newProject.getEmployees().forEach(employee -> {
             notificationService.createAndSendNotification(
                     employee.getId(),
-                    "New project assigned with id: " +newProject.getId(),
-                    "You have been assigned to a new project: " + project.getDescription(),
-                    "project/"+newProject.getId(),
-                    NotificationType.INFO
-                    );
+                    "Nouveau projet assigné",
+                    "Vous avez été assigné au projet \"" + project.getName() + "\" - " + project.getDescription(),
+                    "project/" + newProject.getId(),
+                    NotificationType.INFO);
         });
 
-        return ResponseEntity.ok(modelMapper.map(newProject, ProjectControllerResponseDto.class));
+        UserModel currentUser = userService.findById(tokenUtils.ExtractId());
+        ProjectControllerResponseDto responseDto = ProjectControllerResponseDto.fromProject(newProject, currentUser);
+
+        return ResponseEntity.ok(responseDto);
     }
 
     @PostMapping("/{id}/add-stuff")
@@ -110,29 +123,32 @@ public class ProjectsController {
                     .map(employeeId -> userService.findById(employeeId))
                     .toList();
             project.getEmployees().addAll(employees);
-
+            employees.forEach(employee -> employee.setCurrentProject(project));
             project.getEmployees().forEach(employee -> {
                 notificationService.createAndSendNotification(
                         employee.getId(),
-                        "New project assigned with id: " +project.getId(),
-                        "You have been assigned to a new project: " + project.getDescription(),
-                        "project/"+project.getId(),
-                        NotificationType.INFO
-                );
+                        "Ajouté à un projet",
+                        "Vous avez été ajouté au projet \"" + project.getName() + "\" - " + project.getDescription(),
+                        "project/" + project.getId(),
+                        NotificationType.INFO);
             });
         }
 
-        return ResponseEntity.ok(projectService.save(project));
+        Project savedProject = projectService.save(project);
+        UserModel currentUser = userService.findById(tokenUtils.ExtractId());
+        ProjectControllerResponseDto responseDto = ProjectControllerResponseDto.fromProject(savedProject, currentUser);
+
+        return ResponseEntity.ok(responseDto);
     }
 
     @GetMapping("/current")
-    public ResponseEntity<CurrentProjectInfo> getCurrentProjectTask() {
+    public ResponseEntity<?> getCurrentProjectTask() {
         UserModel userModel = userService.findById(tokenUtils.ExtractId());
+        if (userModel.getCurrentProject() == null) {
+            return ResponseEntity.noContent().build(); // Return 204 No Content when user has no current project
+        }
         return ResponseEntity.ok(CurrentProjectInfo.fromProject(userModel.getCurrentProject(), userModel));
-
     }
-
-
 
     @GetMapping("/manager")
     public ResponseEntity<?> getProjectByManager() {
@@ -140,7 +156,7 @@ public class ProjectsController {
         List<Project> projects = projectService.findByManagerId(userModel.getId());
 
         return ResponseEntity.ok(projects.stream()
-                .map(project -> modelMapper.map(project, ProjectControllerResponseDto.class))
+                .map(project -> ProjectControllerResponseDto.fromProject(project, userModel))
                 .collect(Collectors.toList()));
     }
 

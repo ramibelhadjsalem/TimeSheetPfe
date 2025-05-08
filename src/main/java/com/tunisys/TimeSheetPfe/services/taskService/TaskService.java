@@ -13,23 +13,34 @@ import java.util.List;
 @Service
 public class TaskService {
 
-    @Autowired private TaskRepository repository ;
-    public Task Save(Task task){
+    @Autowired
+    private TaskRepository repository;
+
+    public Task Save(Task task) {
         return repository.save(task);
     }
 
-    public Task getById(Long id){
+    public Task getById(Long id) {
         return repository.findById(id)
-                .orElseThrow(()-> new EntityNotFoundException("NO task found with id"+id));
+                .orElseThrow(() -> new EntityNotFoundException("NO task found with id" + id));
     }
 
-    public List<Task> getAll(){
+    public List<Task> getAll() {
         return repository.findAll();
     }
 
-    public void deleteById(Long id){
+    public void deleteById(Long id) {
         repository.deleteById(id);
     }
+
+    public void deleteTaskSafely(Long id) {
+        Task task = getById(id);
+        task.prepareForDeletion(); // Détache la tâche des utilisateurs et du projet
+        repository.save(task); // Sauvegarde les changements de relations
+        repository.delete(task); // Supprime la tâche et les feuilles de temps associées (grâce à
+                                 // CascadeType.ALL)
+    }
+
     public List<Task> findByDeadline(java.time.LocalDate today) {
         return repository.findByDeadline(today);
     }
@@ -40,7 +51,7 @@ public class TaskService {
 
     public List<Task> getTasksByUserIdAndProjectId(Long userId, Long projectId) {
 
-        return  repository.findByProjectIdAndEmployeeId(userId, projectId);
+        return repository.findByProjectIdAndEmployeeId(userId, projectId);
     }
 
     public Task save(Task task) {

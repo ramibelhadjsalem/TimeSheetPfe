@@ -18,41 +18,48 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/timesheet")
 public class TimeSheetController {
-    @Autowired private UserService userService;
-    @Autowired private TokenUtils tokenUtils;
-    @Autowired private TaskService taskService ;
-    @Autowired private TimeSheetService timeSheetService;
-    @Autowired private ModelMapper modelMapper;
-
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private TokenUtils tokenUtils;
+    @Autowired
+    private TaskService taskService;
+    @Autowired
+    private TimeSheetService timeSheetService;
+    @Autowired
+    private ModelMapper modelMapper;
 
     @GetMapping("/task/{id}")
     public List<TimeSheetResponseDto> findByTaskId(@PathVariable Long id) {
         return taskService.getById(id).getTimesheetEntries().stream()
-                .map(ts -> modelMapper.map(ts, TimeSheetResponseDto.class)
-                ).collect(Collectors.toList());
+                .map(ts -> modelMapper.map(ts, TimeSheetResponseDto.class)).collect(Collectors.toList());
     }
+
     @GetMapping("/user/{id}")
-    public List<TimeSheetResponseDto> findByUserId(@PathVariable Long id){
+    public List<TimeSheetResponseDto> findByUserId(@PathVariable Long id) {
         return timeSheetService.findByUserId(id).stream()
-                .map(ts -> modelMapper.map(ts, TimeSheetResponseDto.class)
-                ) .collect(Collectors.toList());
+                .map(ts -> modelMapper.map(ts, TimeSheetResponseDto.class)).collect(Collectors.toList());
 
     }
+
     @GetMapping("/current")
-    public List<TimeSheetResponseDto> findByCurrentUser(){
+    public List<TimeSheetResponseDto> findByCurrentUser() {
         Long id = tokenUtils.ExtractId();
-        return timeSheetService.findByUserId(id).stream()
-                .map(ts -> modelMapper.map(ts, TimeSheetResponseDto.class)
-                ) .collect(Collectors.toList());
-
+        UserModel user = userService.findById(id);
+        if (user.getCurrentProject() == null) {
+            return Collections.emptyList(); // Return empty list if user has no current project
+        }
+        return timeSheetService.findByUserIdAndCurrentProject(id, user.getCurrentProject().getId()).stream()
+                .map(ts -> modelMapper.map(ts, TimeSheetResponseDto.class))
+                .collect(Collectors.toList());
     }
-
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_EMPLOYEE')")
@@ -67,7 +74,7 @@ public class TimeSheetController {
             return MessageResponse.badRequest("End time must be after start time");
         }
 
-        if (!user.getCurrentProject().getId().equals(task.getProject().getId())) {
+        if (user.getCurrentProject() == null || !user.getCurrentProject().getId().equals(task.getProject().getId())) {
             return MessageResponse.notAllowed("not allowed to do this action");
         }
         TimeSheet timeSheet = TimeSheet
@@ -81,13 +88,14 @@ public class TimeSheetController {
                 .build();
         return ResponseEntity.ok(modelMapper.map(timeSheetService.save(timeSheet), TimeSheetResponseDto.class));
     }
+
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateTimeSheet(@PathVariable Long id,@Valid @RequestBody TimesheetUpdateDto dto){
+    public ResponseEntity<?> updateTimeSheet(@PathVariable Long id, @Valid @RequestBody TimesheetUpdateDto dto) {
         TimeSheet timeSheet = timeSheetService.findById(id);
 
         UserModel user = userService.findById(tokenUtils.ExtractId());
 
-        if (!timeSheet.getTask().getEmployees().contains(user)){
+        if (!timeSheet.getTask().getEmployees().contains(user)) {
             return MessageResponse.notAllowed("Not allowed to update this timesheet");
         }
         int startMins = parseTimeToMinutes(dto.getStartTime());
@@ -102,9 +110,7 @@ public class TimeSheetController {
 
         return ResponseEntity.ok(modelMapper.map(timeSheetService.save(timeSheet), TimeSheetResponseDto.class));
 
-
     }
-
 
     private int parseTimeToMinutes(String time) {
         String[] parts = time.split(":");
@@ -113,4 +119,3 @@ public class TimeSheetController {
         return hours * 60 + minutes;
     }
 }
-

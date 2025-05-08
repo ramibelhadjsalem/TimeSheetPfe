@@ -33,28 +33,31 @@ public class Task {
 
     @Enumerated(EnumType.STRING)
     @JsonView(View.Base.class)
+    @Builder.Default
     private EStatus status = EStatus.NOT_STARTED;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "task_employees",
-            joinColumns = @JoinColumn(name = "task_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id"))
+    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH })
+    @JoinTable(name = "task_employees", joinColumns = @JoinColumn(name = "task_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     @JsonView(View.External.class)
     @JsonManagedReference // Prevent recursion from Task to UserModel
+    @Builder.Default
     private Set<UserModel> employees = new HashSet<>(); // Employees working on the task
 
     @Enumerated(EnumType.STRING)
     @JsonView(View.Base.class)
+    @Builder.Default
     private EPriority priority = EPriority.LOW;
 
     @Enumerated(EnumType.STRING)
     @JsonView(View.Base.class)
+    @Builder.Default
     private EDifficulty difficulty = EDifficulty.EASY;
 
     @ElementCollection
     @CollectionTable(name = "task_attachments", joinColumns = @JoinColumn(name = "task_id"))
     @Column(name = "attachment_url")
     @JsonView(View.Base.class)
+    @Builder.Default
     private List<String> attachments = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -62,20 +65,18 @@ public class Task {
     @JsonView(View.Base.class)
     private Project project;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "manager_id", referencedColumnName = "id")
-//    @JsonView(View.Base.class) // Include the manager in external views
-//    private UserModel manager ;
-
     @JsonView(View.Base.class)
     private LocalDate deadline;
 
+    @JsonView(View.Base.class)
+    private LocalDate finishedAt;
 
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<TimeSheet> timesheetEntries;
 
     public void addEmployee(UserModel user) {
         this.employees.add(user);
+        user.getTasks().add(this); // Update the other side of the relationship
     }
 
     public void prepareForDeletion() {
@@ -85,10 +86,10 @@ public class Task {
         }
         employees.clear();
 
-//        // Detach from manager
-//        if (manager != null) {
-//            manager = null;
-//        }
+        // // Detach from manager
+        // if (manager != null) {
+        // manager = null;
+        // }
 
         // Detach from project
         if (project != null) {
@@ -96,11 +97,7 @@ public class Task {
             project = null;
         }
 
-        // Note: timesheetEntries are automatically deleted due to cascade = CascadeType.ALL
+        // Note: timesheetEntries are automatically deleted due to cascade =
+        // CascadeType.ALL
     }
 }
-
-
-
-
-
