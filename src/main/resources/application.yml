@@ -5,22 +5,33 @@ spring:
     url: jdbc:postgresql://ep-black-dream-a2l4bfzr-pooler.eu-central-1.aws.neon.tech/timesheetapp?sslmode=require
     username: timesheetapp_owner
     password: npg_udNUbLA7S9Gq
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 120000
+      connection-timeout: 30000
   jpa:
     hibernate:
       ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true
-        show_sql: true
+        format_sql: false
+        show_sql: false
+        # Add query optimization settings
+        "jdbc.batch_size": 30
+        "order_inserts": true
+        "order_updates": true
+        # Disable second-level cache for now
+        "cache.use_second_level_cache": false
   logging:
     level:
       org:
         hibernate:
-          SQL: DEBUG
+          SQL: INFO
           type:
             descriptor:
-              sql: TRACE
+              sql: INFO
   mail:
     host: smtp.gmail.com
     port: 587

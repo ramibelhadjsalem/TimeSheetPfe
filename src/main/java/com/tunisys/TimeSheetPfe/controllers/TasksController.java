@@ -133,12 +133,19 @@ public class TasksController {
             @Valid @RequestBody UpdateTaskStatusDto dto) {
         Long userId = tokenUtils.ExtractId();
         Task task = taskService.getById(taskId);
+        UserModel currentUser = userService.findById(userId);
+
         // 🔥 Check if employee is part of assigned employees
         boolean isAssigned = task.getEmployees().stream()
                 .anyMatch(user -> user.getId().equals(userId));
 
         if (!isAssigned) {
-            return ResponseEntity.status(403).body("You are not assigned to this task.");
+            // If not assigned, add the user to the task's employees
+            task.addEmployee(currentUser);
+            task = taskService.save(task);
+
+            // Log that we've added the user to the task
+            System.out.println("Added user " + userId + " to task " + taskId + " employees list");
         }
 
         EStatus currentStatus = task.getStatus();

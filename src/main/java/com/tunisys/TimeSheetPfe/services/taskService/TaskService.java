@@ -1,13 +1,12 @@
 package com.tunisys.TimeSheetPfe.services.taskService;
 
-import com.tunisys.TimeSheetPfe.exceptions.EntityNotFoundException;
 import com.tunisys.TimeSheetPfe.models.Task;
 import com.tunisys.TimeSheetPfe.repositories.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Arrays;
+
 import java.util.List;
 
 @Service
@@ -21,12 +20,11 @@ public class TaskService {
     }
 
     public Task getById(Long id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("NO task found with id" + id));
+        return repository.findByIdWithDetails(id);
     }
 
     public List<Task> getAll() {
-        return repository.findAll();
+        return repository.findAllWithDetails();
     }
 
     public void deleteById(Long id) {

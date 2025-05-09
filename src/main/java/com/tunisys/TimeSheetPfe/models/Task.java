@@ -36,7 +36,7 @@ public class Task {
     @Builder.Default
     private EStatus status = EStatus.NOT_STARTED;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH })
+    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH })
     @JoinTable(name = "task_employees", joinColumns = @JoinColumn(name = "task_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     @JsonView(View.External.class)
     @JsonManagedReference // Prevent recursion from Task to UserModel

@@ -70,13 +70,13 @@ public class UserModel {
     @Builder.Default
     private Set<Role> roles = new HashSet<>();
 
-    @ManyToMany(mappedBy = "employees", fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
+    @ManyToMany(mappedBy = "employees", fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
             CascadeType.DETACH })
     @JsonView(View.Base.class)
     @JsonBackReference()
     private Set<Task> tasks = new HashSet<>();
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "current_project_id")
     @JsonView(View.Base.class)
     private Project currentProject;

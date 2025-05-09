@@ -9,14 +9,21 @@ import java.util.List;
 
 public interface ProjectRepository extends JpaRepository<Project, Long> {
 
-    @Query("select p from Project p where p.deadline = ?1")
+    @Query("SELECT p FROM Project p LEFT JOIN FETCH p.manager LEFT JOIN FETCH p.employees WHERE p.deadline = ?1")
     List<Project> findByDeadline(LocalDate today);
 
-    @Query("SELECT p FROM Project p WHERE p.deadline BETWEEN :startDate AND :endDate")
+    @Query("SELECT p FROM Project p LEFT JOIN FETCH p.manager LEFT JOIN FETCH p.employees WHERE p.deadline BETWEEN :startDate AND :endDate")
     List<Project> findByDeadlineBetween(LocalDate startDate, LocalDate endDate);
 
+    @Query("SELECT p FROM Project p LEFT JOIN FETCH p.employees LEFT JOIN FETCH p.tasks WHERE p.manager.id = :managerId")
     List<Project> findByManagerId(Long managerId);
 
-    @Query("SELECT p FROM Project p JOIN p.employees e WHERE e.id = :userId")
+    @Query("SELECT DISTINCT p FROM Project p LEFT JOIN FETCH p.manager LEFT JOIN FETCH p.employees e WHERE e.id = :userId")
     List<Project> findProjectsByEmployeeId(Long userId);
+
+    @Query("SELECT DISTINCT p FROM Project p LEFT JOIN FETCH p.manager LEFT JOIN FETCH p.employees LEFT JOIN FETCH p.tasks")
+    List<Project> findAllWithDetails();
+
+    @Query("SELECT p FROM Project p LEFT JOIN FETCH p.manager LEFT JOIN FETCH p.employees LEFT JOIN FETCH p.tasks WHERE p.id = :id")
+    Project findByIdWithDetails(Long id);
 }

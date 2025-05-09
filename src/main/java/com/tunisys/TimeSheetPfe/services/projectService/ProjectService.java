@@ -1,6 +1,5 @@
 package com.tunisys.TimeSheetPfe.services.projectService;
 
-import com.tunisys.TimeSheetPfe.exceptions.EntityNotFoundException;
 import com.tunisys.TimeSheetPfe.models.Project;
 import com.tunisys.TimeSheetPfe.repositories.ProjectRepository;
 import jakarta.transaction.Transactional;
@@ -13,24 +12,23 @@ import java.util.List;
 @Service
 public class ProjectService {
 
-    @Autowired private ProjectRepository repository;
+    @Autowired
+    private ProjectRepository repository;
 
-
-    public Project save(Project project){
+    public Project save(Project project) {
         return repository.save(project);
     }
 
-    public Project getById(Long id){
-        return repository.findById(id)
-                .orElseThrow(()-> new EntityNotFoundException("NO project found with id"+id));
+    public Project getById(Long id) {
+        return repository.findByIdWithDetails(id);
     }
 
-    public List<Project> getAll(){
-        return repository.findAll();
+    public List<Project> getAll() {
+        return repository.findAllWithDetails();
     }
 
-    public void deleteById(Long id){
-         repository.deleteById(id);
+    public void deleteById(Long id) {
+        repository.deleteById(id);
     }
 
     public List<Project> findByDeadline(LocalDate today) {
