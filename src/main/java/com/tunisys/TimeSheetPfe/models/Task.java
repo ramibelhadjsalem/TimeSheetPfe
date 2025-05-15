@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -69,7 +70,10 @@ public class Task {
     private LocalDate deadline;
 
     @JsonView(View.Base.class)
-    private LocalDate finishedAt;
+    private LocalDateTime startAt;
+
+    @JsonView(View.Base.class)
+    private LocalDateTime finishedAt;
 
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<TimeSheet> timesheetEntries;

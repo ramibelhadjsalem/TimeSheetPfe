@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -19,7 +20,8 @@ public class TaskResponseDto {
     private String priority; // Task Priority
     private String difficulty;
     private LocalDate deadline;
-    private LocalDate finishedAt; // Date when the task was finished
+    private LocalDateTime startAt; // Date and time when the task was started
+    private LocalDateTime finishedAt; // Date and time when the task was finished
     private Long projectId; // Project ID
     private List<User> employees;
 
@@ -44,6 +46,7 @@ public class TaskResponseDto {
         dto.setPriority(task.getPriority().name());
         dto.setDifficulty(task.getDifficulty().name());
         dto.setDeadline(task.getDeadline());
+        dto.setStartAt(task.getStartAt());
         dto.setFinishedAt(task.getFinishedAt());
 
         // Set project ID if project exists

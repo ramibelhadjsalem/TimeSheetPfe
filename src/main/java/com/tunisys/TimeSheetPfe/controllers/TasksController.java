@@ -16,6 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -164,13 +165,32 @@ public class TasksController {
             }
         } else if (currentStatus == EStatus.NOT_STARTED && requestedStatus == EStatus.PROGRESS) {
             task.setStatus(EStatus.PROGRESS);
+            // Set startAt to current date or provided date when task is started
+            if (dto.getStartAt() != null) {
+                task.setStartAt(dto.getStartAt());
+            } else {
+                task.setStartAt(LocalDateTime.now());
+            }
         } else if (currentStatus == EStatus.PROGRESS && requestedStatus == EStatus.FINISHED) {
             task.setStatus(EStatus.FINISHED);
-            // Set finishedAt to current date when task is marked as finished
+
+            // Set finishedAt to provided date or current date when task is marked as
+            // finished
             if (dto.getFinishedAt() != null) {
                 task.setFinishedAt(dto.getFinishedAt());
             } else {
-                task.setFinishedAt(LocalDate.now());
+                task.setFinishedAt(LocalDateTime.now());
+            }
+
+            // If startAt is not set yet, set it to the provided startAt or to a time before
+            // finishedAt
+            if (task.getStartAt() == null) {
+                if (dto.getStartAt() != null) {
+                    task.setStartAt(dto.getStartAt());
+                } else {
+                    // If no startAt is provided, set it to 1 hour before finishedAt
+                    task.setStartAt(task.getFinishedAt().minusHours(1));
+                }
             }
         } else {
             return ResponseEntity.badRequest().body("Invalid status transition for employee.");
@@ -208,7 +228,12 @@ public class TasksController {
 
             // If task is being approved and finishedAt is not set, set it to now
             if (requestedStatus == EStatus.IMPROVED && task.getFinishedAt() == null) {
-                task.setFinishedAt(LocalDate.now());
+                task.setFinishedAt(LocalDateTime.now());
+
+                // If startAt is not set yet, set it to 1 hour before finishedAt
+                if (task.getStartAt() == null) {
+                    task.setStartAt(task.getFinishedAt().minusHours(1));
+                }
             }
 
             taskService.save(task);

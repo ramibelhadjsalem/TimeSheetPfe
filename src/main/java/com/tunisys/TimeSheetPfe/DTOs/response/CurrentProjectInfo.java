@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -40,7 +41,8 @@ public class CurrentProjectInfo {
                 private String difficulty;
                 private Set<User> employees;
                 private LocalDate deadline;
-                private LocalDate finishedAt;
+                private LocalDateTime startAt;
+                private LocalDateTime finishedAt;
                 private Long projectId; // Project ID
 
                 public static TaskProjectDto fromTask(Task task) {
@@ -55,6 +57,7 @@ public class CurrentProjectInfo {
                                                         .map(User::fromUser)
                                                         .collect(Collectors.toSet()))
                                         .deadline(task.getDeadline())
+                                        .startAt(task.getStartAt())
                                         .finishedAt(task.getFinishedAt())
                                         .projectId(task.getProject() != null ? task.getProject().getId() : null)
                                         .build();
