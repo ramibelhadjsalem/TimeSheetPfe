@@ -5,6 +5,7 @@ import com.google.firebase.messaging.Message;
 import com.tunisys.TimeSheetPfe.models.Connection;
 import com.tunisys.TimeSheetPfe.models.Notification;
 import com.tunisys.TimeSheetPfe.models.NotificationType;
+import com.tunisys.TimeSheetPfe.models.UserModel;
 import com.tunisys.TimeSheetPfe.repositories.ConnectionRepository;
 import com.tunisys.TimeSheetPfe.repositories.NotificationRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -105,5 +106,9 @@ public class NotificationService {
 
         // 4. Return updated notifications, ordered by createdAt descending
         return notificationRepository.findByUserIdOrderByCreatedAtDesc(userId);
+    }
+
+    public void sendNotification(UserModel user, String title, String body, NotificationType type) {
+        createAndSendNotification(user.getId(), title, body, null, type);
     }
 }
