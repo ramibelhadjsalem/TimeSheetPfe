@@ -9,6 +9,7 @@ import com.tunisys.TimeSheetPfe.models.UserModel;
 import com.tunisys.TimeSheetPfe.services.userService.UserService;
 import com.tunisys.TimeSheetPfe.services.notificationService.NotificationService;
 import com.tunisys.TimeSheetPfe.utils.TokenUtils;
+import com.tunisys.TimeSheetPfe.utils.NotificationMessages;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -83,9 +84,9 @@ public class NotificationController {
         for (UserModel admin : admins) {
             notificationService.createAndSendNotification(
                     admin.getId(),
-                    "Demande d'assignation à un projet",
-                    "L'employé " + user.getName() + " (" + user.getEmail() + ") demande à être assigné à un projet.",
-                    "/admin/employees/" + userId,
+                    NotificationMessages.Projects.PROJECT_ASSIGNMENT_REQUEST_TITLE,
+                    NotificationMessages.Projects.projectAssignmentRequestBodyForAdmin(user.getName(), user.getEmail()),
+                    NotificationMessages.ActionUrls.adminEmployeeUrl(userId),
                     NotificationType.WARNING);
             notificationsSent++;
         }
@@ -94,16 +95,15 @@ public class NotificationController {
         for (UserModel manager : managers) {
             notificationService.createAndSendNotification(
                     manager.getId(),
-                    "Demande d'assignation à un projet",
-                    "L'employé " + user.getName() + " (" + user.getEmail() + ") demande à être assigné à un projet. " +
-                            "Vous pouvez l'ajouter à l'un de vos projets si vous avez besoin de personnel supplémentaire.",
-                    "/manager/employees/" + userId,
+                    NotificationMessages.Projects.PROJECT_ASSIGNMENT_REQUEST_TITLE,
+                    NotificationMessages.Projects.projectAssignmentRequestBodyForManager(user.getName(), user.getEmail()),
+                    NotificationMessages.ActionUrls.managerEmployeeUrl(userId),
                     NotificationType.INFO);
             notificationsSent++;
         }
 
-        return ResponseEntity.ok(new MessageResponse("Votre demande a été envoyée à " + notificationsSent +
-                " administrateur(s) et manager(s)."));
+        return ResponseEntity.ok(new MessageResponse(
+                NotificationMessages.Projects.projectAssignmentRequestSuccessMessage(notificationsSent)));
     }
 
 }

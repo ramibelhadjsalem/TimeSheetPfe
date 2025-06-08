@@ -9,6 +9,7 @@ import com.tunisys.TimeSheetPfe.services.projectService.ProjectService;
 import com.tunisys.TimeSheetPfe.services.taskService.TaskService;
 import com.tunisys.TimeSheetPfe.services.userService.UserService;
 import com.tunisys.TimeSheetPfe.utils.TokenUtils;
+import com.tunisys.TimeSheetPfe.utils.NotificationMessages;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -82,9 +83,9 @@ public class TasksController {
         finalTask.getEmployees().forEach(employee -> {
             notificationService.createAndSendNotification(
                     employee.getId(),
-                    "Nouvelle tâche assignée",
-                    "Vous avez été assigné à la tâche \"" + finalTask.getTitle() + "\" - " + finalTask.getDescription(),
-                    "task/" + finalTask.getId(),
+                    NotificationMessages.Tasks.NEW_TASK_ASSIGNED_TITLE,
+                    NotificationMessages.Tasks.newTaskAssignedBody(finalTask.getTitle(), finalTask.getDescription()),
+                    NotificationMessages.ActionUrls.taskUrl(finalTask.getId()),
                     NotificationType.INFO);
         });
 
@@ -140,13 +141,17 @@ public class TasksController {
         boolean isAssigned = task.getEmployees().stream()
                 .anyMatch(user -> user.getId().equals(userId));
 
-        if (!isAssigned) {
-            // If not assigned, add the user to the task's employees
+        // Only add user to task when they start working on it (status becomes PROGRESS)
+        if (!isAssigned && dto.getStatus() == EStatus.PROGRESS) {
+            // If not assigned and task is being started, add the user to the task's employees
             task.addEmployee(currentUser);
             task = taskService.save(task);
 
             // Log that we've added the user to the task
-            System.out.println("Added user " + userId + " to task " + taskId + " employees list");
+            System.out.println("Added user " + userId + " to task " + taskId + " employees list when starting task");
+        } else if (!isAssigned && dto.getStatus() != EStatus.PROGRESS) {
+            // User is not assigned and not starting the task - they shouldn't be able to update it
+            return ResponseEntity.badRequest().body("Vous devez commencer la tâche avant de pouvoir modifier son statut.");
         }
 
         EStatus currentStatus = task.getStatus();
@@ -201,9 +206,9 @@ public class TasksController {
         if (model != null) {
             notificationService.createAndSendNotification(
                     model.getId(),
-                    "🔄 Statut de tâche mis à jour",
-                    "Le statut de la tâche \"" + task.getTitle() + "\" a été mis à jour à " + task.getStatus(),
-                    "task/" + task.getId(),
+                    NotificationMessages.Tasks.TASK_STATUS_UPDATED_TITLE,
+                    NotificationMessages.Tasks.taskStatusUpdatedBody(task.getTitle(), task.getStatus().toString()),
+                    NotificationMessages.ActionUrls.taskUrl(task.getId()),
                     NotificationType.INFO);
         }
         return ResponseEntity.ok("Task status updated successfully by employee.");
@@ -239,17 +244,18 @@ public class TasksController {
             taskService.save(task);
 
             task.getEmployees().forEach(employee -> {
-                String emoji = task.getStatus().equals(EStatus.IMPROVED) ? "✅" : "⚠️";
-                String statusText = task.getStatus().equals(EStatus.IMPROVED) ? "APPROUVÉE" : "DÉSAPPROUVÉE";
+                boolean isApproved = task.getStatus().equals(EStatus.IMPROVED);
+                String title = isApproved ? NotificationMessages.Tasks.TASK_APPROVED_TITLE : NotificationMessages.Tasks.TASK_DISAPPROVED_TITLE;
+                String body = isApproved ?
+                    NotificationMessages.Tasks.taskApprovedBody(task.getTitle()) :
+                    NotificationMessages.Tasks.taskDisapprovedBody(task.getTitle());
 
                 notificationService.createAndSendNotification(
                         employee.getId(),
-                        emoji + " Tâche " + statusText,
-                        "Votre tâche \"" + task.getTitle() + "\" a été " +
-                                (task.getStatus().equals(EStatus.IMPROVED) ? "approuvée" : "désapprouvée") +
-                                " par le manager.",
-                        "task/" + task.getId(),
-                        task.getStatus().equals(EStatus.IMPROVED) ? NotificationType.INFO : NotificationType.WARNING);
+                        title,
+                        body,
+                        NotificationMessages.ActionUrls.taskUrl(task.getId()),
+                        isApproved ? NotificationType.INFO : NotificationType.WARNING);
             });
             return ResponseEntity.ok("Task status updated successfully by manager.");
         } else {
@@ -283,9 +289,9 @@ public class TasksController {
             employees.forEach(employee -> {
                 notificationService.createAndSendNotification(
                         employee.getId(),
-                        "Tache supprimee",
-                        "La tache \"" + taskTitle + "\" a laquelle vous étiez assigné a ete supprimee.",
-                        "dashboard",
+                        NotificationMessages.Tasks.TASK_DELETED_TITLE,
+                        NotificationMessages.Tasks.taskDeletedBody(taskTitle),
+                        NotificationMessages.ActionUrls.DASHBOARD_URL,
                         NotificationType.WARNING);
             });
 

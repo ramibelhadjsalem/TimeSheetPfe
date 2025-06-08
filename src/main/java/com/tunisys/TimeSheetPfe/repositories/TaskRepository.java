@@ -16,7 +16,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     @Query("SELECT DISTINCT t FROM Task t LEFT JOIN FETCH t.employees LEFT JOIN FETCH t.project WHERE t.deadline BETWEEN ?1 AND ?2")
     List<Task> findByDeadlineBetween(LocalDate today, LocalDate endDate);
 
-    @Query("SELECT DISTINCT t FROM Task t LEFT JOIN FETCH t.employees e LEFT JOIN FETCH t.project WHERE e.id = :userId AND t.project.id = :projectId")
+    @Query("SELECT t FROM Task t LEFT JOIN FETCH t.project WHERE t.id IN (SELECT DISTINCT t2.id FROM Task t2 JOIN t2.employees e WHERE e.id = :userId AND t2.project.id = :projectId)")
     List<Task> findByProjectIdAndEmployeeId(@Param("userId") Long userId, @Param("projectId") Long projectId);
 
     @Query("SELECT DISTINCT t FROM Task t LEFT JOIN FETCH t.employees LEFT JOIN FETCH t.project")

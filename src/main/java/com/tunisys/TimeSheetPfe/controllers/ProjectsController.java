@@ -12,6 +12,7 @@ import com.tunisys.TimeSheetPfe.services.notificationService.NotificationService
 import com.tunisys.TimeSheetPfe.services.projectService.ProjectService;
 import com.tunisys.TimeSheetPfe.services.userService.UserService;
 import com.tunisys.TimeSheetPfe.utils.TokenUtils;
+import com.tunisys.TimeSheetPfe.utils.NotificationMessages;
 import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,9 +93,9 @@ public class ProjectsController {
         newProject.getEmployees().forEach(employee -> {
             notificationService.createAndSendNotification(
                     employee.getId(),
-                    "Nouveau projet assigné",
-                    "Vous avez été assigné au projet \"" + project.getName() + "\" - " + project.getDescription(),
-                    "project/" + newProject.getId(),
+                    NotificationMessages.Projects.NEW_PROJECT_ASSIGNED_TITLE,
+                    NotificationMessages.Projects.newProjectAssignedBody(project.getName(), project.getDescription()),
+                    NotificationMessages.ActionUrls.projectUrl(newProject.getId()),
                     NotificationType.INFO);
         });
 
@@ -127,9 +128,9 @@ public class ProjectsController {
             project.getEmployees().forEach(employee -> {
                 notificationService.createAndSendNotification(
                         employee.getId(),
-                        "Ajouté à un projet",
-                        "Vous avez été ajouté au projet \"" + project.getName() + "\" - " + project.getDescription(),
-                        "project/" + project.getId(),
+                        NotificationMessages.Projects.ADDED_TO_PROJECT_TITLE,
+                        NotificationMessages.Projects.addedToProjectBody(project.getName(), project.getDescription()),
+                        NotificationMessages.ActionUrls.projectUrl(project.getId()),
                         NotificationType.INFO);
             });
         }
